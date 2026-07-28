@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Typecheck · Lint · Test · Build
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: rft360
+          POSTGRES_PASSWORD: rft360_ci
+          POSTGRES_DB: rft360_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rft360"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://rft360:rft360_ci@localhost:5432/rft360_test?schema=public
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-access-secret-not-for-production-use-only
+      JWT_REFRESH_SECRET: ci-refresh-secret-not-for-production-use-only
+      AUTH_SECRET: ci-authjs-secret-not-for-production-use-only
+      REVALIDATE_SECRET: ci-revalidate-secret
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The db:* scripts load the monorepo-root .env via dotenv-cli; CI sets the
+      # values as job env, so materialise them into a .env for those steps.
+      - name: Write .env
+        run: |
+          {
+            echo "DATABASE_URL=$DATABASE_URL"
+            echo "REDIS_URL=$REDIS_URL"
+            echo "JWT_SECRET=$JWT_SECRET"
+            echo "JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET"
+            echo "AUTH_SECRET=$AUTH_SECRET"
+            echo "REVALIDATE_SECRET=$REVALIDATE_SECRET"
+            echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL"
+            echo "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL"
+          } > .env
+
+      - name: Build shared package
+        run: npm run build --workspace=@rft360/shared
+
+      - name: Generate Prisma client
+        run: npm run db:generate
+
+      - name: Run migrations
+        run: npm run db:deploy
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build

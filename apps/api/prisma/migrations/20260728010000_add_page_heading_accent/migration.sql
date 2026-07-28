@@ -1,0 +1,1 @@
+-- Intentionally empty: superseded by 20260728020000_page_heading_accent_column.

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.next/
+.turbo/
+coverage/
+apps/api/uploads/
+apps/web/public/
+package-lock.json
+*.pdf
+*.docx
+*.png
+rft360 - Copy/
+planner_extracted.txt

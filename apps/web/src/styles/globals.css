@@ -1,0 +1,1361 @@
+@import 'tailwindcss';
+
+/* ============================================================================
+   RFT360 DESIGN SYSTEM
+   A faithful port of the original static design (rft360 - Copy/css/style.css).
+   Token values, spacing, effects and animations are carried over verbatim.
+
+   ONE deliberate change: the accent red is the brand-guide value #DE181B
+   (the original used #e60021). Typography stays on the original Outfit +
+   JetBrains Mono. Everything else is 1:1.
+   ============================================================================ */
+
+/* ---- Dark theme (default — the signature look) --------------------------- */
+:root {
+  --bg-dark: #070709;
+  --bg-surface: #0b0b0e;
+  --bg-card: #0f0f14;
+  --bg-card-hover: #141419;
+
+  --accent: #de181b; /* brand guide Primary Red */
+  --accent-dim: #970f11;
+  --accent-hover: #f22c30;
+  --accent-glow: rgba(222, 24, 27, 0.3);
+  --accent-subtle: rgba(222, 24, 27, 0.05);
+
+  --text-primary: #f4f4f8;
+  --text-secondary: #7a8499;
+  --text-muted: #3d4455;
+  --border: rgba(255, 255, 255, 0.048);
+  --border-accent: rgba(222, 24, 27, 0.22);
+
+  /* Gradient used on accent headings (same ramp as the original). */
+  --gradient-accent: linear-gradient(135deg, #de181b 0%, #ff3355 50%, #ff7088 100%);
+  --gradient-white: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 100%);
+
+  --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Aliases: the original used Outfit for BOTH headings and body, so these two
+     resolve to the same family. Kept as named roles for readability. */
+  --font-heading: var(--font-outfit), sans-serif;
+  --font-body: var(--font-outfit), sans-serif;
+
+  color-scheme: dark;
+}
+
+/* ---- Light theme (counterpart for the toggle) ---------------------------- */
+:root[data-theme='light'] {
+  --bg-dark: #ffffff;
+  --bg-surface: #f7f7f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f4f4f7;
+
+  --accent: #de181b;
+  --accent-dim: #970f11;
+  --accent-hover: #c0141a;
+  --accent-glow: rgba(222, 24, 27, 0.16);
+  --accent-subtle: rgba(222, 24, 27, 0.05);
+
+  --text-primary: #13120d;
+  --text-secondary: #55606f;
+  --text-muted: #98a0ad;
+  --border: rgba(19, 18, 13, 0.09);
+  --border-accent: rgba(222, 24, 27, 0.28);
+
+  --gradient-accent: linear-gradient(135deg, #de181b 0%, #b3070a 100%);
+  --gradient-white: linear-gradient(180deg, #13120d 0%, rgba(19, 18, 13, 0.55) 100%);
+
+  color-scheme: light;
+}
+
+/* ---- Tailwind token bridge ----------------------------------------------- */
+@theme inline {
+  --color-bg: var(--bg-dark);
+  --color-surface: var(--bg-surface);
+  --color-card: var(--bg-card);
+  --color-card-hover: var(--bg-card-hover);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-text: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-jb), ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+/* ---- Reset & base (verbatim) ---------------------------------------------
+   MUST live in @layer base: unlayered CSS outranks Tailwind's layered
+   utilities, so an unlayered `* { margin:0; padding:0 }` would silently kill
+   every margin and padding utility in the app. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-outfit), sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+  }
+
+  img,
+  svg {
+    max-width: 100%;
+    display: block;
+  }
+
+  /* Accessibility addition — the original had no visible focus state. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* Thin brand scrollbar (from the original scroll container). */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(222, 24, 27, 0.45);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+}
+
+@layer components {
+  /* ============================================================================
+     SECTIONS  (.scroll-section)
+     Full-viewport height and vertically centred, exactly like the original.
+     Scroll-snap itself is intentionally omitted (see CLAUDE.md) — the visual
+     result is identical, but long lists stay readable.
+     ============================================================================ */
+  .scroll-section {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 5rem 0 0;
+  }
+
+  /* Hairline rule that tops most sections. */
+  .section-rule-accent::before,
+  .section-rule-muted::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+  }
+  .section-rule-accent::before {
+    background: linear-gradient(90deg, transparent 0%, rgba(222, 24, 27, 0.35) 50%, transparent 100%);
+  }
+  .section-rule-muted::before {
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
+  }
+
+  /* ---- Container / grid -----------------------------------------------------
+     Fluid: content spans the full viewport with proportional gutters rather
+     than being capped at a fixed centred column. The gutter scales with the
+     screen (min 1.25rem on phones, max 5rem on very wide displays), so nothing
+     ever touches the edge. Sections contribute no horizontal padding — the
+     container owns the gutters, so they can't double up. */
+  .container-rft {
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 4vw, 5rem);
+  }
+
+  /* Reading-width variant: long-form text (articles, job descriptions) stays
+     capped, because full-bleed paragraphs are unreadable on a wide monitor. */
+  .container-reading {
+    max-width: 860px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+  @media (max-width: 768px) {
+    .grid-2 {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+
+  /* ============================================================================
+     NAVBAR
+     ============================================================================ */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem clamp(1.25rem, 4vw, 5rem);
+    z-index: 9999;
+    transition: var(--transition);
+  }
+  .navbar.scrolled {
+    padding: 1rem clamp(1.25rem, 4vw, 5rem);
+    background: color-mix(in srgb, var(--bg-dark) 92%, transparent);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-text {
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+  }
+  .logo-text span {
+    color: var(--accent);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--text-primary) 45%, transparent);
+    letter-spacing: 0.2px;
+    transition: color 0.25s ease;
+  }
+  .nav-links a:hover,
+  .nav-links a.active {
+    color: var(--text-primary);
+  }
+
+  /* ---- Buttons -------------------------------------------------------------- */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    color: #fff;
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.2px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0);
+    transition: background 0.25s ease;
+  }
+  .btn-primary:hover::after {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(222, 24, 27, 0.4);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: color-mix(in srgb, var(--text-primary) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+  }
+  .btn-outline:hover {
+    border-color: color-mix(in srgb, var(--text-primary) 35%, transparent);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+  }
+
+  /* ============================================================================
+     SIDE DOT NAVIGATION
+     ============================================================================ */
+  .side-dots {
+    position: fixed;
+    right: 1.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    z-index: 1000;
+  }
+  @media (max-width: 900px) {
+    .side-dots {
+      display: none;
+    }
+  }
+
+  .side-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--text-primary) 18%, transparent);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border: none;
+    padding: 0;
+  }
+  .side-dot:hover {
+    background: color-mix(in srgb, var(--text-primary) 50%, transparent);
+    transform: scale(1.4);
+  }
+  .side-dot.active {
+    background: var(--accent);
+    width: 5px;
+    height: 20px;
+    border-radius: 3px;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  .side-dot[data-label]::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: color-mix(in srgb, var(--text-primary) 70%, transparent);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .side-dot:hover[data-label]::after {
+    opacity: 1;
+  }
+
+  /* ============================================================================
+     TYPOGRAPHY  (weights and letter-spacing verbatim from the original)
+     ============================================================================ */
+  .display-xl {
+    font-size: clamp(3.5rem, 6.5vw, 7rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -4px;
+    color: var(--text-primary);
+  }
+  .display-lg {
+    font-size: clamp(2.5rem, 4vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -2.5px;
+    color: var(--text-primary);
+  }
+  .display-md {
+    font-size: clamp(1.8rem, 3vw, 3rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    color: var(--text-primary);
+  }
+
+  .eyebrow {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+  }
+
+  .text-accent-grad {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .text-white-grad {
+    background: var(--gradient-white);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .body-text {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    max-width: 520px;
+  }
+
+  .font-mono-rft {
+    font-family: var(--font-mono-jb), ui-monospace, monospace;
+  }
+
+  /* ============================================================================
+     SCROLL REVEAL  (same easing/duration as the original .animate-* classes)
+     ============================================================================ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition:
+      opacity 0.9s var(--ease-out),
+      transform 0.9s var(--ease-out);
+    will-change: opacity, transform;
+  }
+  .reveal[data-direction='left'] {
+    transform: translateX(-50px);
+  }
+  .reveal[data-direction='right'] {
+    transform: translateX(50px);
+  }
+  .reveal[data-direction='scale'] {
+    opacity: 0;
+    transform: scale(0.92) translateY(20px);
+    transition:
+      opacity 0.7s var(--ease-out),
+      transform 0.7s var(--ease-spring);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ============================================================================
+     HAIRLINE GRID
+     The original's signature block: cells separated by 1px lines rather than
+     floating cards. Achieved with gap:1px over a border-coloured background.
+     ============================================================================ */
+  .hairline-grid {
+    display: grid;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  /* A cell inside a hairline grid: no lift, background shift + red top sweep. */
+  .grid-cell {
+    background: var(--bg-card);
+    transition: background 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .grid-cell::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .grid-cell:hover {
+    background: var(--bg-card-hover);
+  }
+  .grid-cell:hover::after {
+    opacity: 1;
+  }
+
+  /* ---- Standalone card (used where the original used .card) ---------------- */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2rem;
+    transition: all 0.35s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(222, 24, 27, 0.5), transparent);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    border-color: var(--border-accent);
+    background: var(--bg-card-hover);
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.5),
+      0 0 40px rgba(222, 24, 27, 0.06);
+  }
+  .card:hover::after {
+    opacity: 1;
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 11px;
+    background: rgba(222, 24, 27, 0.07);
+    border: 1px solid rgba(222, 24, 27, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.35s ease;
+    color: var(--accent);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .card:hover .card-icon,
+  .grid-cell:hover .card-icon {
+    background: rgba(222, 24, 27, 0.12);
+    border-color: rgba(222, 24, 27, 0.28);
+  }
+
+  /* Smaller icon tile used in the services grid. */
+  .card-icon-sm {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+  }
+
+  /* ---- Numbered label above a service card -------------------------------- */
+  .svc-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    font-family: var(--font-mono-jb), monospace;
+  }
+
+  /* ============================================================================
+     INDUSTRY / ICON TILES
+     ============================================================================ */
+  .ind-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+  .ind-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 11px;
+    background: rgba(222, 24, 27, 0.06);
+    border: 1px solid rgba(222, 24, 27, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: var(--accent);
+    font-size: 1.2rem;
+  }
+  .grid-cell:hover .ind-icon {
+    background: rgba(222, 24, 27, 0.1);
+    border-color: rgba(222, 24, 27, 0.25);
+  }
+  .ind-cell span {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--text-primary) 55%, transparent);
+    letter-spacing: 0.5px;
+  }
+
+  /* ============================================================================
+     STATS
+     ============================================================================ */
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: var(--text-primary);
+  }
+  .stat-desc {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  /* Hero inline stat row */
+  .hero-stat-val {
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+  .hero-stat-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  /* ============================================================================
+     PROGRESS BARS
+     ============================================================================ */
+  .progress-item {
+    margin-bottom: 1.75rem;
+  }
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+  }
+  .progress-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--text-primary) 70%, transparent);
+  }
+  .progress-value {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: var(--font-mono-jb), monospace;
+  }
+  .progress-track {
+    width: 100%;
+    height: 3px;
+    background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+    border-radius: 10px;
+    overflow: visible;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+    border-radius: 10px;
+    width: 0%;
+    transition: width 1.6s var(--ease-out);
+    position: relative;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: -4px;
+    width: 11px;
+    height: 11px;
+    background: #fff;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 12px rgba(222, 24, 27, 0.6);
+  }
+
+  /* ============================================================================
+     TERMINAL
+     ============================================================================ */
+  .terminal-window {
+    background: #06060a;
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 50px 120px rgba(0, 0, 0, 0.8);
+  }
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.85rem 1.1rem;
+    background: rgba(255, 255, 255, 0.025);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  .t-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+  .t-dot.r {
+    background: #ff5f56;
+  }
+  .t-dot.y {
+    background: #ffbd2e;
+  }
+  .t-dot.g {
+    background: #27c93f;
+  }
+  .terminal-title {
+    margin: 0 auto;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.22);
+    font-family: var(--font-mono-jb), monospace;
+  }
+  .terminal-body {
+    padding: 1.5rem;
+    font-family: var(--font-mono-jb), monospace;
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: #4a5568;
+    min-height: 220px;
+  }
+  .t-line {
+    display: block;
+  }
+  .t-comment {
+    color: #2d3748;
+    font-style: italic;
+  }
+  .t-keyword {
+    color: #f87171;
+  }
+  .t-string {
+    color: #6ee7b7;
+  }
+  .t-number {
+    color: #fca5a5;
+  }
+  .t-class {
+    color: #93c5fd;
+  }
+  .t-default {
+    color: #6b7280;
+  }
+  .t-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--accent);
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* ============================================================================
+     MISC COMPONENTS
+     ============================================================================ */
+  .details-list {
+    list-style: none;
+    margin: 1.5rem 0;
+  }
+  .details-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .tech-box {
+    background: color-mix(in srgb, var(--text-primary) 2%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.25s ease;
+    font-family: var(--font-mono-jb), monospace;
+  }
+  .tech-box:hover {
+    background: rgba(222, 24, 27, 0.05);
+    border-color: rgba(222, 24, 27, 0.2);
+    color: var(--text-primary);
+  }
+
+  /* Credentials row under the industries grid */
+  .cred-row {
+    display: flex;
+    gap: 2.5rem;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .cred-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+  }
+  .cred-item i {
+    color: var(--accent);
+    font-size: 0.75rem;
+  }
+
+  /* Job row */
+  .job-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    transition: var(--transition);
+  }
+  .job-card:hover {
+    border-color: var(--border-accent);
+    transform: translateX(6px);
+    background: var(--bg-card-hover);
+  }
+  .job-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: color-mix(in srgb, var(--text-primary) 4%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0.2rem 0.7rem;
+  }
+
+  /* Fact stack (about page) */
+  .fact-item {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .fact-item:last-child {
+    border-bottom: none;
+  }
+  .fact-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+  }
+  .fact-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--text-primary) 70%, transparent);
+  }
+
+  /* Floating live badge */
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, var(--text-primary) 3%, transparent);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 7%, transparent);
+    border-radius: 100px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    width: fit-content;
+  }
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    animation: live-pulse 1.8s ease infinite;
+  }
+
+  .accent-rule {
+    width: 40px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* Hero year stamp */
+  .hero-stamp {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .hero-stamp-line {
+    width: 30px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .hero-stamp-text {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--text-primary) 30%, transparent);
+  }
+
+  /* ---- Scroll indicator ----------------------------------------------------- */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    animation: si-float 2.5s ease-in-out infinite;
+  }
+  .scroll-indicator span {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .scroll-mouse {
+    width: 20px;
+    height: 32px;
+    border: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    padding-top: 5px;
+  }
+  .scroll-wheel {
+    width: 2px;
+    height: 6px;
+    background: color-mix(in srgb, var(--text-primary) 30%, transparent);
+    border-radius: 2px;
+    animation: s-wheel 1.8s ease-in-out infinite;
+  }
+
+  /* ---- Theme-aware logo swap ------------------------------------------------ */
+  .logo-on-dark {
+    opacity: 1;
+  }
+  .logo-on-light {
+    opacity: 0;
+  }
+  :root[data-theme='light'] .logo-on-dark {
+    opacity: 0;
+  }
+  :root[data-theme='light'] .logo-on-light {
+    opacity: 1;
+  }
+
+  /* ---- Keyframes (verbatim) ------------------------------------------------- */
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+  @keyframes live-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.3);
+    }
+  }
+  @keyframes si-float {
+    0%,
+    100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    50% {
+      transform: translateX(-50%) translateY(5px);
+    }
+  }
+  @keyframes s-wheel {
+    0% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+  }
+
+  /* ============================================================================
+     MOTION — additions beyond the original's reveal/counter/typing effects.
+     All are decorative and disabled under prefers-reduced-motion.
+     ============================================================================ */
+
+  /* Thin scroll-progress bar pinned under the navbar. */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    z-index: 10000;
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent), #ff7088);
+    box-shadow: 0 0 12px var(--accent-glow);
+    transform-origin: left center;
+    will-change: transform;
+  }
+
+  /* Slow vertical drift, used on the hero panel. */
+  .float-slow {
+    animation: float-slow 7s ease-in-out infinite;
+  }
+  .float-slower {
+    animation: float-slow 9s ease-in-out infinite;
+    animation-delay: -3s;
+  }
+
+  /* Moving sheen across gradient headings.
+     MUST use `background-image`, not the `background` shorthand: the shorthand
+     resets `background-clip` to border-box, which kills the text clipping and
+     renders the heading as a solid filled rectangle. The clip properties are
+     re-asserted here for the same reason. */
+  .text-accent-grad.shimmer {
+    background-image: linear-gradient(
+      100deg,
+      var(--accent) 0%,
+      #ff3355 25%,
+      #ff8a8d 45%,
+      #ff3355 65%,
+      var(--accent) 100%
+    );
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: shimmer 6s ease-in-out infinite;
+  }
+
+  /* Soft breathing glow behind the hero panel. */
+  .panel-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(140deg, var(--border-accent), transparent 45%, var(--border-accent));
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: breathe 5s ease-in-out infinite;
+  }
+
+  /* Orbs drift on pointer move (set via CSS vars from JS). */
+  .orb-parallax {
+    transform: translate3d(var(--px, 0), var(--py, 0), 0);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+  @keyframes shimmer {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* ============================================================================
+     RESPONSIVE
+     The original design was desktop-first with only two coarse breakpoints.
+     This tightens type, spacing and grids down to 360px so the site is fully
+     usable on phones while keeping the desktop rendering byte-identical.
+     ============================================================================ */
+
+  /* Tablet and below */
+  @media (max-width: 900px) {
+    .scroll-section {
+      /* Content-height sections on small screens: a forced 100vh with this much
+         content wastes space and pushes CTAs below the fold.
+         Top padding must exceed the fixed navbar height (~64px) or the first
+         element slides underneath it. */
+      min-height: 0;
+      padding: 7rem 0 4rem;
+      align-items: flex-start;
+    }
+    .display-xl {
+      letter-spacing: -2px;
+    }
+    .display-lg {
+      letter-spacing: -1.5px;
+    }
+    .display-md {
+      letter-spacing: -1px;
+    }
+    .nav-links {
+      gap: 1.5rem;
+    }
+    .cred-row {
+      gap: 1.25rem 2rem;
+    }
+    .job-card {
+      padding: 1.25rem 1.5rem;
+    }
+  }
+
+  /* Phones */
+  @media (max-width: 640px) {
+    .scroll-section {
+      padding: 6.5rem 0 3.5rem;
+    }
+    .display-xl {
+      font-size: clamp(2.5rem, 11vw, 3.6rem);
+      letter-spacing: -1.5px;
+      line-height: 1.02;
+    }
+    .display-lg {
+      font-size: clamp(2rem, 9vw, 2.75rem);
+      letter-spacing: -1px;
+      line-height: 1.06;
+    }
+    .display-md {
+      font-size: clamp(1.5rem, 7vw, 2rem);
+      letter-spacing: -0.5px;
+    }
+    .eyebrow {
+      letter-spacing: 2px;
+      margin-bottom: 0.875rem;
+    }
+    .body-text {
+      font-size: 0.95rem;
+      line-height: 1.75;
+    }
+    .navbar {
+      padding: 1rem 1.25rem;
+    }
+    .navbar.scrolled {
+      padding: 0.75rem 1.25rem;
+    }
+    /* Corners look heavy on a narrow viewport. */
+    .hairline-grid {
+      border-radius: 12px;
+    }
+    .stat-number {
+      font-size: 2.25rem;
+      letter-spacing: -1px;
+    }
+    .hero-stat-val {
+      font-size: 1.65rem;
+      letter-spacing: -1px;
+    }
+    .hero-stat-label {
+      font-size: 0.6rem;
+      letter-spacing: 1.2px;
+    }
+    .hero-stamp-text {
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+    }
+    /* Full-width tap targets read better than side-by-side on a phone. */
+    .btn-primary,
+    .btn-outline {
+      justify-content: center;
+    }
+    .terminal-body {
+      font-size: 0.72rem;
+      min-height: 180px;
+      padding: 1.1rem;
+    }
+    .card {
+      padding: 1.5rem;
+    }
+    .prose-rft {
+      font-size: 1rem;
+    }
+    .prose-rft h2 {
+      font-size: 1.5rem;
+    }
+    .prose-rft h3 {
+      font-size: 1.2rem;
+    }
+    /* The floating indicator overlaps content on short screens. */
+    .scroll-indicator {
+      display: none;
+    }
+  }
+
+  /* Very narrow phones */
+  @media (max-width: 380px) {
+    .container-rft {
+      padding: 0 1rem;
+    }
+    .display-xl {
+      font-size: 2.25rem;
+    }
+  }
+
+  /* ---- Reduced motion ------------------------------------------------------- */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+    .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    /* Decorative loops are removed entirely rather than sped up. */
+    .float-slow,
+    .float-slower {
+      animation: none !important;
+    }
+    .orb-parallax {
+      transform: none !important;
+    }
+  }
+
+  /* ============================================================================
+     RICH TEXT (blog / article bodies)
+     ============================================================================ */
+  .prose-rft {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    font-size: 1.05rem;
+  }
+  .prose-rft h2 {
+    color: var(--text-primary);
+    font-size: 1.9rem;
+    font-weight: 800;
+    margin: 2.5rem 0 1rem;
+    letter-spacing: -1px;
+  }
+  .prose-rft h3 {
+    color: var(--text-primary);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 2rem 0 0.75rem;
+    letter-spacing: -0.5px;
+  }
+  .prose-rft p {
+    margin-bottom: 1.5rem;
+  }
+  .prose-rft a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-rft ul,
+  .prose-rft ol {
+    margin: 0 0 1.5rem 1.5rem;
+  }
+  .prose-rft li {
+    margin-bottom: 0.5rem;
+  }
+  .prose-rft blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.25rem;
+    margin: 1.5rem 0;
+    color: var(--text-primary);
+    font-style: italic;
+  }
+  .prose-rft img {
+    border-radius: 12px;
+    margin: 2rem 0;
+    border: 1px solid var(--border);
+  }
+  .prose-rft pre {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+    font-family: var(--font-mono-jb), monospace;
+  }
+  .prose-rft code {
+    font-family: var(--font-mono-jb), monospace;
+    font-size: 0.9em;
+  }
+
+}

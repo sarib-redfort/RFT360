@@ -1,0 +1,10 @@
+import { Global, Module } from '@nestjs/common';
+import { RevalidationService } from './revalidation.service';
+
+/** Global so every content service can trigger revalidation on publish. */
+@Global()
+@Module({
+  providers: [RevalidationService],
+  exports: [RevalidationService],
+})
+export class RevalidationModule {}

@@ -1,0 +1,56 @@
+{
+  "name": "rft360",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RFT360 — RedFort Group employer branding platform (Next.js + NestJS + PostgreSQL + Redis)",
+  "packageManager": "npm@11.13.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@rft360/web",
+    "dev:api": "turbo run dev --filter=@rft360/api",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rimraf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md,css}\"",
+    "db:generate": "npm run db:generate --workspace=@rft360/api",
+    "db:migrate": "npm run db:migrate --workspace=@rft360/api",
+    "db:deploy": "npm run db:deploy --workspace=@rft360/api",
+    "db:seed": "npm run db:seed --workspace=@rft360/api",
+    "db:studio": "npm run db:studio --workspace=@rft360/api",
+    "db:reset": "npm run db:reset --workspace=@rft360/api",
+    "db:up": "node scripts/db.mjs up",
+    "db:down": "node scripts/db.mjs down",
+    "db:status": "node scripts/db.mjs status",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.4.2",
+    "rimraf": "^6.0.1",
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs}": [
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
+  }
+}
