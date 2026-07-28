@@ -1,6 +1,25 @@
 import { z } from 'zod';
 
 /**
+ * Boolean from an env var.
+ *
+ * `z.coerce.boolean()` is JS `Boolean()`, so EVERY non-empty string is true —
+ * including "false" and "0". That silently turned `SMTP_SECURE=false` into
+ * `true`, which makes nodemailer attempt implicit TLS on port 587 (a STARTTLS
+ * port) and fails every contact-form and job-application email in production.
+ * Parse the text instead of coercing it.
+ */
+const boolFromEnv = (defaultValue: boolean) =>
+  z
+    .union([z.boolean(), z.string()])
+    .optional()
+    .transform((value) => {
+      if (value === undefined) return defaultValue;
+      if (typeof value === 'boolean') return value;
+      return ['true', '1', 'yes', 'on'].includes(value.trim().toLowerCase());
+    });
+
+/**
  * Environment schema.
  *
  * Validated once at boot by {@link validateEnv}; the process refuses to start if
@@ -54,12 +73,12 @@ const envSchema = z.object({
   S3_ACCESS_KEY_ID: z.string().optional(),
   S3_SECRET_ACCESS_KEY: z.string().optional(),
   S3_PUBLIC_URL: z.string().optional(),
-  S3_FORCE_PATH_STYLE: z.coerce.boolean().default(false),
+  S3_FORCE_PATH_STYLE: boolFromEnv(false),
 
   // Email
   SMTP_HOST: z.string().default('localhost'),
   SMTP_PORT: z.coerce.number().int().positive().default(1025),
-  SMTP_SECURE: z.coerce.boolean().default(false),
+  SMTP_SECURE: boolFromEnv(false),
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   MAIL_FROM: z.string().default('RFT360 <noreply@redfort360.com>'),
