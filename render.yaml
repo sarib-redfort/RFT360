@@ -1,0 +1,121 @@
+# ==============================================================================
+# RFT360 API — Render Blueprint (free tier)
+#
+# Deploys apps/api only. The Next.js site lives on Vercel (see DEPLOY.md);
+# Postgres on Neon and Redis on Upstash, because Render's own free Postgres
+# expires after 30 days.
+#
+# Import with: Render Dashboard -> New -> Blueprint -> pick this repo.
+# Values marked `sync: false` are prompted for on import and never committed.
+# ==============================================================================
+services:
+  - type: web
+    name: rft360-api
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+
+    # `--include=dev` is REQUIRED: NODE_ENV=production (set below) makes `npm ci`
+    # skip devDependencies, which is where the Nest CLI, TypeScript, Prisma CLI
+    # and ts-node live — the build fails without them.
+    #
+    # Order matters: @rft360/shared compiles first (the API imports its built
+    # output), then the Prisma client is generated, then Nest compiles to dist/.
+    buildCommand: >-
+      npm ci --include=dev &&
+      npm run build --workspace=@rft360/shared &&
+      npm run db:generate --workspace=@rft360/api &&
+      npm run build --workspace=@rft360/api
+
+    # Runs on every deploy, before the new instance takes traffic. `migrate
+    # deploy` only applies pending migrations and never resets data, so it is
+    # safe to repeat. Seeding is a ONE-TIME manual step — see DEPLOY.md.
+    preDeployCommand: npm run db:deploy --workspace=@rft360/api
+
+    startCommand: node apps/api/dist/main.js
+
+    healthCheckPath: /health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PREFIX
+        value: api
+
+      # Render injects PORT itself; the API prefers it over API_PORT.
+
+      # --- Connections (paste from Neon / Upstash) ---------------------------
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+      # --- Secrets (Render generates these; never hand-written) --------------
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      # Must be IDENTICAL to the web app's REVALIDATE_SECRET, so it is prompted
+      # for rather than generated — copy the same value into Vercel.
+      - key: REVALIDATE_SECRET
+        sync: false
+
+      # --- Origins ----------------------------------------------------------
+      # Both must be the live Vercel URL. WEB_URL is where publish webhooks are
+      # sent (wrong value = CMS edits never appear on the site); CORS_ORIGINS is
+      # the browser allowlist (wrong value = admin uploads fail in the browser).
+      - key: WEB_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: API_URL
+        sync: false
+
+      # --- Storage ----------------------------------------------------------
+      # s3 is MANDATORY here: Render's filesystem is wiped on every deploy, so
+      # `local` silently loses every uploaded image. Point these at Cloudflare R2.
+      - key: STORAGE_DRIVER
+        value: s3
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_REGION
+        value: auto
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_PUBLIC_URL
+        sync: false
+      - key: S3_FORCE_PATH_STYLE
+        value: false
+      - key: MAX_UPLOAD_SIZE_MB
+        value: 10
+
+      # --- Mail (Gmail app password, Resend, Brevo, …) -----------------------
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_SECURE
+        value: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: MAIL_NOTIFY_TO
+        sync: false
+
+      # --- First CMS administrator (used by the one-time seed) --------------
+      # The API refuses to boot in production if the password is still the
+      # default `ChangeMe123!`.
+      - key: SEED_ADMIN_EMAIL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
+      - key: SEED_ADMIN_NAME
+        value: RFT360 Administrator

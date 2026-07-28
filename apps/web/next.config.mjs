@@ -8,13 +8,36 @@
 
 /** @type {import('next').NextConfig} */
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
-// Derive the API host so uploaded media (served from the API origin) is allowed.
-let apiHost = 'localhost';
-try {
-  apiHost = new URL(apiUrl).hostname;
-} catch {
-  /* keep default */
+
+/** Hostname of a URL, or null when it isn't parseable. */
+function hostOf(url) {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
 }
+
+/** Origin of a URL, or null when it isn't parseable. */
+function originOf(url) {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+}
+
+const apiHost = hostOf(apiUrl) ?? 'localhost';
+
+/*
+ * With STORAGE_DRIVER=s3 the API hands back absolute URLs on the object store's
+ * own domain (Cloudflare R2, S3, MinIO) — NOT the API origin. That host has to
+ * be allowlisted in BOTH places below or every uploaded image breaks in
+ * production: `next/image` refuses to optimise an unlisted hostname, and the CSP
+ * blocks the request even if it did. `NEXT_PUBLIC_MEDIA_URL` must match the
+ * API's `S3_PUBLIC_URL`.
+ */
+const mediaHost = hostOf(process.env.NEXT_PUBLIC_MEDIA_URL ?? '');
 
 const nextConfig = {
   reactStrictMode: true,
@@ -25,18 +48,16 @@ const nextConfig = {
       { protocol: 'http', hostname: apiHost },
       { protocol: 'https', hostname: apiHost },
       { protocol: 'http', hostname: 'localhost' },
+      ...(mediaHost ? [{ protocol: 'https', hostname: mediaHost }] : []),
       // Unsplash placeholders used by the styleguide/seed until real media is uploaded.
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
   async headers() {
-    const apiOrigin = (() => {
-      try {
-        return new URL(apiUrl).origin;
-      } catch {
-        return 'http://localhost:4000';
-      }
-    })();
+    const apiOrigin = originOf(apiUrl) ?? 'http://localhost:4000';
+    const mediaOrigin = originOf(process.env.NEXT_PUBLIC_MEDIA_URL ?? '');
+    // Deduped so a media URL on the API origin doesn't repeat in the directive.
+    const imgOrigins = [...new Set([apiOrigin, mediaOrigin].filter(Boolean))].join(' ');
 
     /**
      * Content Security Policy.
@@ -51,8 +72,8 @@ const nextConfig = {
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com",
       "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
       "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:",
-      `img-src 'self' data: blob: ${apiOrigin} https://images.unsplash.com https://www.google-analytics.com`,
-      `connect-src 'self' ${apiOrigin} https://www.google-analytics.com`,
+      `img-src 'self' data: blob: ${imgOrigins} https://images.unsplash.com https://www.google-analytics.com`,
+      `connect-src 'self' ${imgOrigins} https://www.google-analytics.com`,
       "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.google.com https://maps.google.com",
       "object-src 'none'",
       "base-uri 'self'",

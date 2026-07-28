@@ -11,6 +11,12 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 
   // Server
+  /*
+   * Managed hosts (Render, Fly.io, Railway, Heroku) inject the port to listen on
+   * as `PORT` and route traffic nowhere else. It therefore has to win over
+   * API_PORT, so the same build runs locally and in production unchanged.
+   */
+  PORT: z.coerce.number().int().positive().optional(),
   API_PORT: z.coerce.number().int().positive().default(4000),
   API_PREFIX: z.string().default('api'),
   API_URL: z.string().url().default('http://localhost:4000'),
@@ -148,7 +154,7 @@ export function configFactory() {
     env: env.NODE_ENV,
     isProduction: env.NODE_ENV === 'production',
     server: {
-      port: env.API_PORT,
+      port: env.PORT ?? env.API_PORT,
       prefix: env.API_PREFIX,
       url: env.API_URL,
       corsOrigins,

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+
+  "_comment_root_directory": "Set the Vercel project's Root Directory to `apps/web` — this file is read from there. Vercel detects the npm workspace above it and installs from the repo root automatically.",
+
+  "_comment_build": "Built through Turbo from the repo root so @rft360/shared compiles first (dependsOn ^build). `next build` alone fails here: the web app imports @rft360/shared's dist output, which npm install does not produce.",
+  "buildCommand": "cd ../.. && npx turbo run build --filter=@rft360/web",
+
+  "_comment_devdeps": "--include=dev keeps TypeScript and the Turbo/Next toolchain available even when NODE_ENV=production is set on the project.",
+  "installCommand": "cd ../.. && npm ci --include=dev",
+
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
+}
