@@ -13,7 +13,11 @@ services:
     name: rft360-api
     runtime: node
     plan: free
-    region: oregon
+    # Keep this in the same geography as the database. Every request makes
+    # several round trips to Postgres, so a Render instance in Oregon talking to
+    # a Neon project in us-east-2 pays ~60-80ms of transit on each one.
+    # `ohio` == AWS us-east-2. Change both together, never just one.
+    region: ohio
     branch: main
 
     # `--include=dev` is REQUIRED: NODE_ENV=production (set below) makes `npm ci`
