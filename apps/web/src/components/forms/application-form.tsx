@@ -127,7 +127,7 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: 
       <input type="text" tabIndex={-1} aria-hidden className="hidden" {...register('website')} />
 
       <label className="mt-4 flex items-start gap-3 text-sm text-[var(--text-secondary)]">
-        <input type="checkbox" className="mt-1 h-4 w-4 accent-[var(--accent)]" {...register('consent')} />
+        <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--accent)]" {...register('consent')} />
         <span>
           I consent to RedFort processing my application data.
           {errors.consent && (

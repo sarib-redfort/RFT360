@@ -105,7 +105,7 @@ export function ContactForm() {
       <label className="mt-4 flex items-start gap-3 text-sm text-[var(--text-secondary)]">
         <input
           type="checkbox"
-          className="mt-1 h-4 w-4 accent-[var(--accent)]"
+          className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--accent)]"
           {...register('consent')}
         />
         <span>

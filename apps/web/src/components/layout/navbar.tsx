@@ -33,8 +33,7 @@ export function Navbar({ items }: { items: NavItem[] }) {
 
   useEffect(() => setOpen(false), [pathname]);
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
   return (
     <header className={cn('navbar', scrolled && 'scrolled')}>
@@ -60,7 +59,7 @@ export function Navbar({ items }: { items: NavItem[] }) {
           aria-label="Toggle menu"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-primary)] lg:hidden"
+          className="tap-target inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-primary)] lg:hidden"
         >
           <i className={open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'} aria-hidden />
         </button>
@@ -68,24 +67,41 @@ export function Navbar({ items }: { items: NavItem[] }) {
 
       {/* Mobile menu */}
       {open && (
-        <div className="absolute inset-x-0 top-full border-t border-[var(--border)] bg-[var(--bg-dark)] lg:hidden">
-          <ul className="flex flex-col gap-1 px-[5%] py-4">
-            {items.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={cn(
-                    'block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                    isActive(item.href)
-                      ? 'bg-[var(--bg-card)] text-[var(--text-primary)]'
-                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-primary)]',
-                  )}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="absolute inset-x-0 top-full lg:hidden">
+          <div className="border-t border-[var(--border)] bg-[var(--bg-dark)]">
+            <ul className="flex flex-col gap-1 px-[5%] py-4">
+              {items.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      'tap-link block w-full rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                      isActive(item.href)
+                        ? 'bg-[var(--bg-card)] text-[var(--text-primary)]'
+                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-primary)]',
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/*
+            Dims the rest of the screen and closes on tap. Without it the page
+            content immediately below the short panel stays fully lit, so a
+            half-visible button or heading peeks out under the menu and reads
+            as a rendering glitch. Keyboard users close via the toggle button,
+            which keeps its own focus ring — hence aria-hidden here.
+          */}
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-hidden="true"
+            onClick={() => setOpen(false)}
+            className="h-screen w-full cursor-default bg-[color-mix(in_srgb,var(--bg-dark)_82%,transparent)] backdrop-blur-sm"
+          />
         </div>
       )}
     </header>

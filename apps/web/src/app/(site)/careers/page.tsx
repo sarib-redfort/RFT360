@@ -112,7 +112,7 @@ function FilterChip({ href, active, label }: { href: string; active: boolean; la
     <Link
       href={href}
       className={cn(
-        'rounded-full border px-4 py-2 text-sm font-medium transition-colors',
+        'tap-target inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium transition-colors',
         active
           ? 'border-[var(--border-accent)] bg-[var(--accent-subtle)] text-[var(--accent)]'
           : 'border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-[var(--text-primary)]',

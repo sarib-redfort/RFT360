@@ -101,7 +101,7 @@ export function Footer({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={link.label}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-accent)] hover:text-[var(--accent)]"
+                    className="tap-target flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-accent)] hover:text-[var(--accent)]"
                   >
                     <Icon name={link.icon} />
                   </a>
@@ -123,7 +123,7 @@ export function Footer({
                 <ContactRow icon="fa-solid fa-envelope">
                   <a
                     href={`mailto:${settings.contactEmail}`}
-                    className="transition-colors hover:text-[var(--accent)]"
+                    className="tap-link transition-colors hover:text-[var(--accent)]"
                   >
                     {settings.contactEmail}
                   </a>
@@ -133,7 +133,7 @@ export function Footer({
                 <ContactRow icon="fa-solid fa-phone">
                   <a
                     href={`tel:${settings.contactPhone.replace(/\s/g, '')}`}
-                    className="transition-colors hover:text-[var(--accent)]"
+                    className="tap-link transition-colors hover:text-[var(--accent)]"
                   >
                     {settings.contactPhone}
                   </a>
@@ -172,7 +172,8 @@ export function Footer({
 
 function FooterHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h4 className="text-[0.68rem] font-bold uppercase tracking-[2px] text-[var(--text-muted)]">
+    // 0.68rem is under 11px — legible on a monitor, squinting on a phone.
+    <h4 className="text-[0.72rem] font-bold uppercase tracking-[1.6px] text-[var(--text-muted)] sm:text-[0.68rem] sm:tracking-[2px]">
       {children}
     </h4>
   );
@@ -188,12 +189,12 @@ function FooterColumn({
   return (
     <div>
       <FooterHeading>{title}</FooterHeading>
-      <ul className="mt-5 space-y-3">
+      <ul className="mt-5 space-y-3 sm:space-y-2">
         {links.map((link) => (
           <li key={`${title}-${link.href}`}>
             <Link
               href={link.href}
-              className="text-[0.875rem] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+              className="tap-link text-[0.875rem] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
             >
               {link.label}
             </Link>

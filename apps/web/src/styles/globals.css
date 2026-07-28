@@ -238,8 +238,17 @@
   .navbar.scrolled {
     padding: 1rem clamp(1.25rem, 4vw, 5rem);
     background: color-mix(in srgb, var(--bg-dark) 92%, transparent);
-    backdrop-filter: blur(24px);
+    /*
+     * The PREFIXED form must come first. Lightning CSS (Tailwind v4's bundler)
+     * treats these two as one logical property and keeps only the last
+     * declaration, so writing `-webkit-` last drops the standard property from
+     * the compiled sheet entirely — Chrome then ignores the rule and the
+     * frosted glass never renders, leaving page content ghosting through the
+     * fixed header at 8% opacity. Most obvious on phones, where the navbar
+     * overlaps dense content on every scroll.
+     */
     -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
     border-bottom: 1px solid var(--border);
   }
 
@@ -1148,6 +1157,27 @@
      usable on phones while keeping the desktop rendering byte-identical.
      ============================================================================ */
 
+  /*
+   * Touch targets. Gated on a coarse pointer rather than a width, so a
+   * mouse-driven window narrowed to phone width keeps the compact desktop
+   * rendering while every real touch device gets the 44px minimum from WCAG
+   * 2.5.5 / the iOS HIG. Below that, taps regularly land on the neighbouring
+   * element — the icon buttons in the header and footer were 36px.
+   */
+  @media (hover: none) and (pointer: coarse) {
+    .tap-target {
+      min-width: 44px;
+      min-height: 44px;
+    }
+    /* For inline text links, grow the hit area without drawing a bigger box,
+       so the footer/nav column rhythm is unchanged. */
+    .tap-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
   /* Tablet and below */
   @media (max-width: 900px) {
     .scroll-section {
@@ -1224,13 +1254,16 @@
       font-size: 1.65rem;
       letter-spacing: -1px;
     }
+    /* 9.6px/9.9px is below what's comfortably legible on a phone; 11px is the
+       floor iOS itself uses for tracked uppercase captions. Tracking comes down
+       to buy the width back so the labels still fit three-across. */
     .hero-stat-label {
-      font-size: 0.6rem;
-      letter-spacing: 1.2px;
+      font-size: 0.6875rem;
+      letter-spacing: 0.8px;
     }
     .hero-stamp-text {
-      font-size: 0.62rem;
-      letter-spacing: 2px;
+      font-size: 0.6875rem;
+      letter-spacing: 1.6px;
     }
     /* Full-width tap targets read better than side-by-side on a phone. */
     .btn-primary,

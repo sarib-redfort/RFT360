@@ -77,25 +77,38 @@ export function HeroSection({
               </Reveal>
             )}
 
+            {/* Stacked and full-bleed on a phone — side-by-side buttons size to
+                their label there, which left the two CTAs visibly ragged. */}
             <Reveal delay={0.24}>
-              <div className="mt-10 flex flex-wrap items-center gap-4">
+              <div className="mt-8 flex flex-col items-stretch gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 {section.ctaPrimary && (
-                  <ButtonLink href={section.ctaPrimary.href} size="lg">
+                  <ButtonLink
+                    href={section.ctaPrimary.href}
+                    size="lg"
+                    className="w-full sm:w-auto"
+                  >
                     {section.ctaPrimary.label} &nbsp;
                     <ArrowIcon />
                   </ButtonLink>
                 )}
                 {section.ctaSecondary && (
-                  <ButtonLink href={section.ctaSecondary.href} variant="outline" size="lg">
+                  <ButtonLink
+                    href={section.ctaSecondary.href}
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                  >
                     {section.ctaSecondary.label}
                   </ButtonLink>
                 )}
               </div>
             </Reveal>
 
+            {/* A wrapping flex row strands the third stat on its own line at
+                phone width; an explicit 3-up grid keeps the proof row intact. */}
             {heroStats.length > 0 && (
               <Reveal delay={0.32}>
-                <div className="mt-14 flex flex-wrap gap-x-12 gap-y-6 border-t border-[var(--border)] pt-8">
+                <div className="mt-10 grid grid-cols-3 gap-x-4 gap-y-6 border-t border-[var(--border)] pt-7 sm:mt-14 sm:flex sm:flex-wrap sm:gap-x-12 sm:pt-8">
                   {heroStats.map((stat) => (
                     <div key={stat.id}>
                       <div className="hero-stat-val">
