@@ -72,25 +72,32 @@ services:
       - key: API_URL
         sync: false
 
-      # --- Storage ----------------------------------------------------------
+      # --- Storage (Supabase Storage; see DEPLOY.md step 3) -----------------
       # s3 is MANDATORY here: Render's filesystem is wiped on every deploy, so
-      # `local` silently loses every uploaded image. Point these at Cloudflare R2.
+      # `local` silently loses every uploaded image.
       - key: STORAGE_DRIVER
         value: s3
+      # https://<PROJECT_REF>.storage.supabase.co/storage/v1/s3
       - key: S3_ENDPOINT
         sync: false
+      # The project's real region (e.g. us-east-1), NOT "auto" — it is part of
+      # the SigV4 signature, so a wrong value fails as a signature error.
       - key: S3_REGION
-        value: auto
+        sync: false
       - key: S3_BUCKET
         sync: false
       - key: S3_ACCESS_KEY_ID
         sync: false
       - key: S3_SECRET_ACCESS_KEY
         sync: false
+      # Different host from S3_ENDPOINT:
+      # https://<PROJECT_REF>.supabase.co/storage/v1/object/public/<bucket>
       - key: S3_PUBLIC_URL
         sync: false
+      # Supabase does not serve buckets as subdomains — must stay true here.
+      # (Cloudflare R2 wants false.)
       - key: S3_FORCE_PATH_STYLE
-        value: false
+        value: true
       - key: MAX_UPLOAD_SIZE_MB
         value: 10
 

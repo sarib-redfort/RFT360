@@ -8,12 +8,21 @@ Free-tier deployment, end to end. Budget ~60–90 minutes for the first run.
 | API (NestJS) | **Render** Free web service | 750 h/mo, sleeps after 15 min idle | Only free host that runs a persistent Node process without a card |
 | Database | **Neon** Free | 0.5 GB, always-on | Render's own free Postgres **expires after 30 days** — Neon's doesn't |
 | Cache | **Upstash** Redis Free | 10k commands/day | Optional. The API degrades gracefully without it |
-| Media | **Cloudflare R2** Free | 10 GB + zero egress fees | **Required** — see below |
+| Media | **Supabase** Storage Free | 1 GB, S3-compatible | **Required** — see below. No card needed |
 
-> **R2 is not optional.** Render wipes the container filesystem on every deploy.
-> With `STORAGE_DRIVER=local`, every image uploaded through the CMS disappears
-> the next time you push. The API logs a warning about this at boot; treat it as
-> an error.
+**Nothing in this stack asks for a credit card.** That is why media sits on
+Supabase rather than Cloudflare R2: R2's free tier is bigger (10 GB, zero egress)
+but Cloudflare requires a payment method on file before it will let you enable
+R2 at all. Supabase Storage is S3-compatible, so if you later want R2's headroom
+it is an env-var change with no code change — see "Switching to Cloudflare R2".
+
+> **Object storage is not optional.** Render wipes the container filesystem on
+> every deploy. With `STORAGE_DRIVER=local`, every image uploaded through the CMS
+> disappears the next time you push. The API logs a warning about this at boot;
+> treat it as an error.
+>
+> Budget roughly 600 KB per photo — the upload pipeline keeps the original plus
+> thumbnail/medium/large WebP variants — so 1 GB is about 1,500 images.
 
 **Free-tier reality check:** the Render free instance sleeps after 15 minutes of
 inactivity, so the first request after a quiet spell takes ~30 seconds to wake
@@ -60,28 +69,54 @@ out of connections.
 Skipping this is fine. Redis is treated as an optimisation, never a dependency:
 with it unreachable the API logs one warning and serves everything uncached.
 
-## Step 3 — Media storage (Cloudflare R2)
+## Step 3 — Media storage (Supabase Storage)
 
-1. Sign up at [cloudflare.com](https://cloudflare.com) → **R2** → **Create bucket**
-   → name `rft360-media`. (R2 asks for a card to activate, but the 10 GB tier is
-   genuinely free.)
-2. Bucket → **Settings** → **Public access** → enable **r2.dev subdomain**.
-   Copy the URL — e.g. `https://pub-abc123.r2.dev`.
-3. R2 → **Manage API Tokens** → **Create API token** → permission
-   **Object Read & Write**, scoped to this bucket. Copy the Access Key ID and
-   Secret Access Key — **the secret is shown once**.
-4. Note your Cloudflare **Account ID** from the R2 sidebar.
+No payment method required.
+
+1. Sign up at [supabase.com](https://supabase.com) → **New project**. Name it
+   `rft360`, set a database password (you won't need it — Postgres lives on Neon),
+   and pick a region.
+2. **Storage** → **New bucket** → name `media` → toggle **Public bucket ON**.
+   This matters: the site links images directly, so a private bucket renders
+   every image as a broken icon.
+3. **Project Settings → Storage → S3 access keys** → **New access key**. Copy the
+   Access Key ID and Secret Access Key — **the secret is shown once**.
+4. On that same S3 configuration page, copy the **endpoint** and **region**.
 
 That gives you:
 
 | Variable | Value |
 | --- | --- |
-| `S3_ENDPOINT` | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com` |
-| `S3_BUCKET` | `rft360-media` |
-| `S3_REGION` | `auto` |
+| `S3_ENDPOINT` | `https://<PROJECT_REF>.storage.supabase.co/storage/v1/s3` |
+| `S3_BUCKET` | `media` |
+| `S3_REGION` | your project's region, e.g. `us-east-1` — **copy it exactly** |
 | `S3_ACCESS_KEY_ID` | from step 3 |
 | `S3_SECRET_ACCESS_KEY` | from step 3 |
-| `S3_PUBLIC_URL` | `https://pub-abc123.r2.dev` (from step 2) |
+| `S3_PUBLIC_URL` | `https://<PROJECT_REF>.supabase.co/storage/v1/object/public/media` |
+| `S3_FORCE_PATH_STYLE` | `true` |
+
+Three of these are easy to get subtly wrong:
+
+- **`S3_FORCE_PATH_STYLE` must be `true`.** Supabase does not serve buckets as
+  subdomains; with the default `false` every upload fails to resolve.
+- **`S3_REGION` must match the project's actual region.** Requests are signed
+  with AWS Signature V4, which includes the region — a mismatch is rejected as a
+  signature error, not as a helpful "wrong region" message.
+- **`S3_ENDPOINT` and `S3_PUBLIC_URL` use different hosts.** The S3 API lives on
+  `<ref>.storage.supabase.co`; public reads are served from
+  `<ref>.supabase.co/storage/v1/object/public/<bucket>`. Copying one into the
+  other uploads fine and then serves nothing.
+
+### Switching to Cloudflare R2 later
+
+If you outgrow 1 GB and are willing to put a card on Cloudflare, no code changes
+are needed — [s3.driver.ts](apps/api/src/modules/storage/drivers/s3.driver.ts)
+sets no ACLs and reads everything from env. Create an R2 bucket, enable its
+`r2.dev` subdomain, mint an Object Read & Write token, then swap to
+`S3_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com`, `S3_REGION=auto`,
+`S3_FORCE_PATH_STYLE=false`, and `S3_PUBLIC_URL=https://pub-xxxx.r2.dev`.
+Update `NEXT_PUBLIC_MEDIA_URL` in Vercel to match and redeploy both. Existing
+images stay on Supabase, so copy the bucket across before you retire it.
 
 ## Step 4 — API (Render)
 
@@ -147,9 +182,11 @@ Every future deploy runs migrations automatically and leaves your content alone.
    | `AUTH_TRUST_HOST` | `true` |
    | `REVALIDATE_SECRET` | **the identical value you gave Render** |
 
-   `NEXT_PUBLIC_MEDIA_URL` is what allowlists the R2 host for `next/image` and in
-   the Content-Security-Policy. Get it wrong and every uploaded image renders
-   broken while the console shows CSP violations.
+   `NEXT_PUBLIC_MEDIA_URL` is what allowlists the media host for `next/image`
+   and in the Content-Security-Policy. Get it wrong and every uploaded image
+   renders broken while the console shows CSP violations. For Supabase this is
+   the `.supabase.co/storage/v1/object/public/media` URL — the public one, not
+   the `.storage.supabase.co` S3 endpoint.
 
 4. **Deploy**, then copy the live URL.
 
@@ -179,7 +216,7 @@ If `API_URL` doesn't match the real Render URL, fix that too.
 3. Log in with `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`.
    (First load may take ~30 s while Render wakes.)
 4. **Media → Upload** an image. It succeeds and previews.
-   → Confirms R2 credentials, CORS and the CSP.
+   → Confirms the storage credentials, CORS and the CSP.
 5. **Homepage → Hero → edit the heading → Publish.** Reload the public homepage;
    the new text is there within seconds.
    → Confirms `WEB_URL` and the shared `REVALIDATE_SECRET`.
