@@ -147,7 +147,7 @@ images stay on Supabase, so copy the bucket across before you retire it.
 
 ### Seed the database — once, and only once
 
-The deploy already ran `prisma migrate deploy` (schema only — no content).
+The build already ran `prisma migrate deploy` (schema only — no content).
 Now load the initial content and create your admin user. In Render:
 **Shell** tab →
 
@@ -270,7 +270,9 @@ deployments to keep working.
 ## Day-two operations
 
 **Deploying changes.** Push to `main`. Both platforms rebuild automatically;
-Render applies pending migrations before the new instance takes traffic.
+Render applies pending migrations as the last step of its build. (Migrations run
+in the build rather than as a `preDeployCommand` because pre-deploy commands
+require a paid instance type — on the free plan they are silently ignored.)
 
 **Schema changes.** Create the migration locally (`npm run db:migrate -- --name
 your_change`) and commit `apps/api/prisma/migrations/`. Never run `migrate dev`

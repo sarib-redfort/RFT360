@@ -26,16 +26,19 @@ services:
     #
     # Order matters: @rft360/shared compiles first (the API imports its built
     # output), then the Prisma client is generated, then Nest compiles to dist/.
+    # Migrations run as the LAST build step rather than via `preDeployCommand`,
+    # because pre-deploy commands are a paid-instance feature — on the free plan
+    # they are ignored, and the app would boot against a schema-less database.
+    # Render exposes env vars (incl. DATABASE_URL) during builds, and
+    # `migrate deploy` only applies pending migrations and never resets data, so
+    # it is safe to repeat on every build.
+    # Seeding is a ONE-TIME manual step — see DEPLOY.md.
     buildCommand: >-
       npm ci --include=dev &&
       npm run build --workspace=@rft360/shared &&
       npm run db:generate --workspace=@rft360/api &&
-      npm run build --workspace=@rft360/api
-
-    # Runs on every deploy, before the new instance takes traffic. `migrate
-    # deploy` only applies pending migrations and never resets data, so it is
-    # safe to repeat. Seeding is a ONE-TIME manual step — see DEPLOY.md.
-    preDeployCommand: npm run db:deploy --workspace=@rft360/api
+      npm run build --workspace=@rft360/api &&
+      npm run db:deploy --workspace=@rft360/api
 
     startCommand: node apps/api/dist/main.js
 
