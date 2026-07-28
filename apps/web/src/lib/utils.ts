@@ -57,11 +57,28 @@ export function formatDate(input: string | Date | null | undefined): string {
   }).format(date);
 }
 
-/** Absolute site URL for canonical/OG tags. */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(
-  /\/$/,
-  '',
-);
+/**
+ * Absolute site origin — canonical URLs, OG tags, sitemap, JSON-LD and share
+ * links. Every consumer is server-rendered.
+ *
+ * The Vercel fallback exists to break a chicken-and-egg on the first deploy:
+ * you cannot know the deployment URL until after it deploys, so there is
+ * nothing sensible to put in NEXT_PUBLIC_SITE_URL beforehand. Vercel injects
+ * `VERCEL_PROJECT_PRODUCTION_URL` (the production domain, no protocol) at build
+ * time, so the first deploy already emits correct metadata. Set
+ * NEXT_PUBLIC_SITE_URL once you have a custom domain — it always wins.
+ *
+ * NOTE: `VERCEL_PROJECT_PRODUCTION_URL` is not a NEXT_PUBLIC_ var, so it inlines
+ * as undefined in client bundles. That is fine today because SITE_URL is only
+ * read on the server; if you ever need it in a client component, set
+ * NEXT_PUBLIC_SITE_URL explicitly.
+ */
+const vercelProductionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (vercelProductionUrl ? `https://${vercelProductionUrl}` : '') ||
+  'http://localhost:3000'
+).replace(/\/$/, '');
 
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;

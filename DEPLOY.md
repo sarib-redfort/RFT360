@@ -176,11 +176,19 @@ Every future deploy runs migrations automatically and leaves your content alone.
    | --- | --- |
    | `NEXT_PUBLIC_API_URL` | `https://rft360-api.onrender.com/api/v1` |
    | `API_INTERNAL_URL` | `https://rft360-api.onrender.com/api/v1` |
-   | `NEXT_PUBLIC_SITE_URL` | `https://rft360.vercel.app` (your Vercel URL) |
+   | `NEXT_PUBLIC_SITE_URL` | **leave unset on the first deploy** — see note below |
    | `NEXT_PUBLIC_MEDIA_URL` | your `S3_PUBLIC_URL` — **must match exactly** |
    | `AUTH_SECRET` | a generated secret (Vercel-only; not shared with the API) |
    | `AUTH_TRUST_HOST` | `true` |
    | `REVALIDATE_SECRET` | **the identical value you gave Render** |
+
+   **On `NEXT_PUBLIC_SITE_URL`:** you cannot know the deployment URL until
+   after the first deploy, so leave it unset. Vercel injects
+   `VERCEL_PROJECT_PRODUCTION_URL` at build time and the site falls back to it,
+   producing correct canonical tags, OG tags and `sitemap.xml` on that very
+   first build. Set it explicitly only when you add a custom domain — it then
+   takes priority. Getting this wrong never breaks the site; it only affects
+   SEO metadata and social share links, all of which are server-rendered.
 
    `NEXT_PUBLIC_MEDIA_URL` is what allowlists the media host for `next/image`
    and in the Content-Security-Policy. Get it wrong and every uploaded image
