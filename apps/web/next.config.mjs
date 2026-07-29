@@ -39,6 +39,22 @@ const apiHost = hostOf(apiUrl) ?? 'localhost';
  */
 const mediaHost = hostOf(process.env.NEXT_PUBLIC_MEDIA_URL ?? '');
 
+/*
+ * Supabase serves the same public object from two hostnames —
+ * `<ref>.supabase.co` and `<ref>.storage.supabase.co` — and either is a valid
+ * thing to put in S3_PUBLIC_URL. Whichever one the API was configured with is
+ * baked into the absolute URLs already stored on Media rows, so allowing only
+ * the currently-configured host breaks previously-uploaded images the moment
+ * the setting changes. Allow the sibling host too.
+ */
+function supabaseSibling(host) {
+  if (!host) return null;
+  if (host.endsWith('.storage.supabase.co')) return host.replace('.storage.supabase.co', '.supabase.co');
+  if (host.endsWith('.supabase.co')) return host.replace('.supabase.co', '.storage.supabase.co');
+  return null;
+}
+const mediaHostSibling = supabaseSibling(mediaHost);
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -49,6 +65,7 @@ const nextConfig = {
       { protocol: 'https', hostname: apiHost },
       { protocol: 'http', hostname: 'localhost' },
       ...(mediaHost ? [{ protocol: 'https', hostname: mediaHost }] : []),
+      ...(mediaHostSibling ? [{ protocol: 'https', hostname: mediaHostSibling }] : []),
       // Unsplash placeholders used by the styleguide/seed until real media is uploaded.
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
@@ -56,8 +73,11 @@ const nextConfig = {
   async headers() {
     const apiOrigin = originOf(apiUrl) ?? 'http://localhost:4000';
     const mediaOrigin = originOf(process.env.NEXT_PUBLIC_MEDIA_URL ?? '');
+    const mediaOriginSibling = mediaHostSibling ? `https://${mediaHostSibling}` : null;
     // Deduped so a media URL on the API origin doesn't repeat in the directive.
-    const imgOrigins = [...new Set([apiOrigin, mediaOrigin].filter(Boolean))].join(' ');
+    const imgOrigins = [
+      ...new Set([apiOrigin, mediaOrigin, mediaOriginSibling].filter(Boolean)),
+    ].join(' ');
 
     /**
      * Content Security Policy.

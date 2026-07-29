@@ -176,10 +176,16 @@ services:
       - key: API_INTERNAL_URL
         value: https://rft360-api.onrender.com/api/v1
 
-      # Must equal the API's S3_PUBLIC_URL — it allowlists the media host for
-      # next/image and in the CSP, so a mismatch breaks every uploaded image.
+      # Pulled from the API rather than prompted, because it must equal
+      # S3_PUBLIC_URL exactly: it is what allowlists the media host for
+      # next/image and in the CSP. Left blank or mismatched, uploads succeed and
+      # every image renders as a broken fallback with a 400 from /_next/image —
+      # a failure with no obvious connection to its cause.
       - key: NEXT_PUBLIC_MEDIA_URL
-        sync: false
+        fromService:
+          type: web
+          name: rft360-api
+          envVarKey: S3_PUBLIC_URL
 
       - key: AUTH_SECRET
         generateValue: true
