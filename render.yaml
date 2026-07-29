@@ -1,9 +1,12 @@
 # ==============================================================================
-# RFT360 API — Render Blueprint (free tier)
+# RFT360 — Render Blueprint (free tier)
 #
-# Deploys apps/api only. The Next.js site lives on Vercel (see DEPLOY.md);
-# Postgres on Neon and Redis on Upstash, because Render's own free Postgres
-# expires after 30 days.
+# Deploys BOTH services: the NestJS API and the Next.js site. Postgres lives on
+# Neon and Redis on Upstash, because Render's own free Postgres expires after
+# 30 days.
+#
+# Because both services are on Render their URLs are deterministic, so the
+# cross-references between them are hardcoded rather than prompted.
 #
 # Import with: Render Dashboard -> New -> Blueprint -> pick this repo.
 # Values marked `sync: false` are prompted for on import and never committed.
@@ -63,21 +66,26 @@ services:
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
-      # Must be IDENTICAL to the web app's REVALIDATE_SECRET, so it is prompted
-      # for rather than generated — copy the same value into Vercel.
+      # The web service reads this via `fromService`, so the two can never
+      # drift. Prompted rather than generated so you can reuse an existing value.
       - key: REVALIDATE_SECRET
         sync: false
 
       # --- Origins ----------------------------------------------------------
-      # Both must be the live Vercel URL. WEB_URL is where publish webhooks are
-      # sent (wrong value = CMS edits never appear on the site); CORS_ORIGINS is
-      # the browser allowlist (wrong value = admin uploads fail in the browser).
+      # Both point at the web service below. Because both services are on
+      # Render its URL is deterministic (<name>.onrender.com), so these are
+      # fixed rather than prompted — which removes the chicken-and-egg where
+      # the API needed a URL that did not exist yet.
+      # WEB_URL is where publish webhooks go (wrong = CMS edits never reach the
+      # site); CORS_ORIGINS is the browser allowlist (wrong = the public contact
+      # and job-application forms fail).
+      # If Render appends a suffix because a name was taken, correct these.
       - key: WEB_URL
-        sync: false
+        value: https://rft360-web.onrender.com
       - key: CORS_ORIGINS
-        sync: false
+        value: https://rft360-web.onrender.com
       - key: API_URL
-        sync: false
+        value: https://rft360-api.onrender.com
 
       # --- Storage (Supabase Storage; see DEPLOY.md step 3) -----------------
       # s3 is MANDATORY here: Render's filesystem is wiped on every deploy, so
@@ -133,3 +141,55 @@ services:
         sync: false
       - key: SEED_ADMIN_NAME
         value: RFT360 Administrator
+
+  # ===========================================================================
+  # Next.js site + CMS. Runs as a normal Node server (`next start`), which needs
+  # no adapter — the start script omits `-p` so Next binds to Render's $PORT.
+  # ===========================================================================
+  - type: web
+    name: rft360-web
+    runtime: node
+    plan: free
+    region: ohio
+    branch: main
+
+    # Turbo builds @rft360/shared first (dependsOn ^build); the web app imports
+    # its compiled output, so a bare `next build` fails here.
+    buildCommand: >-
+      npm ci --include=dev &&
+      npx turbo run build --filter=@rft360/web
+
+    startCommand: npm run start --workspace=@rft360/web
+
+    envVars:
+      # NODE_ENV is deliberately NOT set: `next build` and `next start` each set
+      # it correctly, and forcing it breaks prerendering of /404 and /500.
+      # robots.txt, sitemap.xml and the canonical/OG tags are PRERENDERED, so
+      # this must be correct at BUILD time. `RENDER_EXTERNAL_URL` is a runtime
+      # variable and cannot be relied on during the build, so set it explicitly
+      # — the URL is deterministic because the service name is fixed.
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://rft360-web.onrender.com
+
+      - key: NEXT_PUBLIC_API_URL
+        value: https://rft360-api.onrender.com/api/v1
+      - key: API_INTERNAL_URL
+        value: https://rft360-api.onrender.com/api/v1
+
+      # Must equal the API's S3_PUBLIC_URL — it allowlists the media host for
+      # next/image and in the CSP, so a mismatch breaks every uploaded image.
+      - key: NEXT_PUBLIC_MEDIA_URL
+        sync: false
+
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: AUTH_TRUST_HOST
+        value: true
+
+      # Pulled from the API service so the two can never drift. A mismatch here
+      # makes CMS publishes save fine and silently never reach the live site.
+      - key: REVALIDATE_SECRET
+        fromService:
+          type: web
+          name: rft360-api
+          envVarKey: REVALIDATE_SECRET
