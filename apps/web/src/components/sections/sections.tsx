@@ -314,7 +314,6 @@ export function WhyChooseUsSection({ section }: { section: HomepageSection }) {
             heading={section.heading ?? ''}
             accent={section.headingAccent ?? undefined}
             lede={section.subheading ?? undefined}
-            align="center"
           />
           <Reveal delay={0.16} className="mt-10">
             <div className="hairline-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -359,7 +358,7 @@ export function TestimonialsSection({ section }: { section: HomepageSection }) {
         heading={section.heading ?? ''}
         accent={section.headingAccent ?? undefined}
         lede={section.subheading ?? undefined}
-        align="center"
+       
       />
       <Reveal delay={0.16} className="mt-10">
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -375,22 +374,22 @@ export function TestimonialsSection({ section }: { section: HomepageSection }) {
 export function FaqSection({ section }: { section: HomepageSection }) {
   const items = (section.data as FaqItem[]) ?? [];
   return (
-    <Section id={sectionAnchor(section.type)} label={section.name} topRule="accent" containerSize="narrow">
+    <Section id={sectionAnchor(section.type)} label={section.name} topRule="accent">
       <SectionHeading
         eyebrow={section.eyebrow ?? undefined}
         heading={section.heading ?? ''}
         accent={section.headingAccent ?? undefined}
         lede={section.subheading ?? undefined}
-        align="center"
+       
       />
-      <Reveal delay={0.16} className="mt-10">
+      <Reveal delay={0.16} className="mt-10 block max-w-4xl">
         <FaqAccordion items={items} />
       </Reveal>
       {/* The source copy closes the FAQ with a call to the openings list; it had
           nowhere to render, so an editor setting one saw no effect. */}
       {section.ctaPrimary && (
         <Reveal delay={0.24}>
-          <div className="mt-10 text-center">
+          <div className="mt-10">
             <ButtonLink href={section.ctaPrimary.href} size="lg">
               {section.ctaPrimary.label} &nbsp;
               <ArrowIcon />
@@ -494,7 +493,7 @@ export function CertificationsSection({ section }: { section: HomepageSection })
         eyebrow={section.eyebrow ?? undefined}
         heading={section.heading ?? ''}
         accent={section.headingAccent ?? undefined}
-        align="center"
+       
       />
       <div className="cred-row justify-center">
         {items.map((cert) => (
@@ -515,7 +514,7 @@ export function AwardsSection({ section }: { section: HomepageSection }) {
         eyebrow={section.eyebrow ?? undefined}
         heading={section.heading ?? ''}
         accent={section.headingAccent ?? undefined}
-        align="center"
+       
       />
       <Reveal delay={0.16} className="mt-10">
         <div className="hairline-grid grid-cols-1 sm:grid-cols-3">
@@ -626,7 +625,6 @@ export function RichTextSection({ section }: { section: HomepageSection }) {
           heading={section.heading ?? ''}
           accent={section.headingAccent ?? undefined}
           lede={section.subheading ?? undefined}
-          align="center"
         />
         {section.bodyHtml && (
           <div

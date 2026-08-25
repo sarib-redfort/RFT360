@@ -163,15 +163,29 @@
      result is identical, but long lists stay readable.
      ============================================================================ */
   .scroll-section {
-    min-height: 100vh;
     position: relative;
     display: flex;
     align-items: center;
     overflow: hidden;
-    padding: 5rem 0 0;
+    /*
+     * ONE vertical rhythm for every section.
+     *
+     * This was `min-height: 100vh` with vertically centred content, which made
+     * spacing a function of how much content a section happened to have: a
+     * short section floated in ~280px of slack top and bottom, a tall one came
+     * within ~20px of its neighbours. Symmetric padding gives every section the
+     * same breathing room regardless of length.
+     */
+    padding: clamp(4.5rem, 7vw, 7rem) 0;
     /* Anchored jumps (#services, #industries) must clear the fixed navbar,
        or the section's heading lands underneath it. */
     scroll-margin-top: 5rem;
+  }
+
+  /* The hero still fills the viewport — it is the landing impression, and the
+     only section whose height should not be driven by its content. */
+  .scroll-section#hero {
+    min-height: 100vh;
   }
 
   /* Hairline rule that tops most sections. */
@@ -1235,13 +1249,14 @@
   /* Tablet and below */
   @media (max-width: 900px) {
     .scroll-section {
-      /* Content-height sections on small screens: a forced 100vh with this much
-         content wastes space and pushes CTAs below the fold.
-         Top padding must exceed the fixed navbar height (~64px) or the first
-         element slides underneath it. */
-      min-height: 0;
-      padding: 7rem 0 4rem;
+      /* Same symmetric rhythm as desktop, just tighter. Only the hero needs
+         extra top padding, to clear the fixed navbar. */
+      padding: clamp(3.5rem, 8vw, 5rem) 0;
       align-items: flex-start;
+    }
+    .scroll-section#hero {
+      min-height: 0;
+      padding-top: 7rem;
     }
     .display-xl {
       letter-spacing: -2px;
@@ -1266,7 +1281,10 @@
   /* Phones */
   @media (max-width: 640px) {
     .scroll-section {
-      padding: 6.5rem 0 3.5rem;
+      padding: 3.25rem 0;
+    }
+    .scroll-section#hero {
+      padding-top: 6.5rem;
     }
     .display-xl {
       font-size: clamp(2.5rem, 11vw, 3.6rem);
