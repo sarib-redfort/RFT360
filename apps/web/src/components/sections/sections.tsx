@@ -187,10 +187,15 @@ export function ServicesSection({ section }: { section: HomepageSection }) {
         eyebrow={section.eyebrow}
         heading={section.heading}
         accent={section.headingAccent}
+        lede={section.subheading}
+        /* CMS-driven rather than hardcoded: the shipped copy has no
+           call-to-action here, and an invented one reads as stray chrome. */
         action={
-          <ButtonLink href="/about-culture" variant="outline">
-            About Our Culture
-          </ButtonLink>
+          section.ctaPrimary ? (
+            <ButtonLink href={section.ctaPrimary.href} variant="outline">
+              {section.ctaPrimary.label}
+            </ButtonLink>
+          ) : undefined
         }
       />
       <Reveal delay={0.16} className="mt-10">
@@ -217,7 +222,9 @@ export function IndustriesSection({ section }: { section: HomepageSection }) {
         lede={section.subheading}
       />
       <Reveal delay={0.16} className="mt-10">
-        <div className="hairline-grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+        {/* Seven industries, each with a supporting line: a 6-up grid strands
+            one on its own row and leaves no width for the copy. */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((industry) => (
             <IndustryTile key={industry.id} industry={industry} />
           ))}
@@ -364,6 +371,18 @@ export function FaqSection({ section }: { section: HomepageSection }) {
       <Reveal delay={0.16} className="mt-10">
         <FaqAccordion items={items} />
       </Reveal>
+      {/* The source copy closes the FAQ with a call to the openings list; it had
+          nowhere to render, so an editor setting one saw no effect. */}
+      {section.ctaPrimary && (
+        <Reveal delay={0.24}>
+          <div className="mt-10 text-center">
+            <ButtonLink href={section.ctaPrimary.href} size="lg">
+              {section.ctaPrimary.label} &nbsp;
+              <ArrowIcon />
+            </ButtonLink>
+          </div>
+        </Reveal>
+      )}
     </Section>
   );
 }
@@ -504,7 +523,13 @@ export function AwardsSection({ section }: { section: HomepageSection }) {
 }
 
 /** Contact — heading + CTA on the left, form on the right (original CTA layout). */
-export function ContactFormSection({ section }: { section: HomepageSection }) {
+export function ContactFormSection({
+  section,
+  contactEmail,
+}: {
+  section: HomepageSection;
+  contactEmail?: string | null;
+}) {
   return (
     <Section label={section.name} topRule="accent" glow glowStyle={{ top: '50%', right: -200, transform: 'translateY(-50%)', width: 700, height: 600 }}>
       <div className="grid items-start gap-16 lg:grid-cols-2">
@@ -530,16 +555,43 @@ export function ContactFormSection({ section }: { section: HomepageSection }) {
               <p className="body-text mt-8">{section.subheading}</p>
             </Reveal>
           )}
-          {section.ctaPrimary && (
-            <Reveal delay={0.24}>
-              <div className="mt-8">
-                <ButtonLink href={section.ctaPrimary.href} size="lg">
-                  {section.ctaPrimary.label} &nbsp;
-                  <ArrowIcon />
-                </ButtonLink>
-              </div>
+          {/* The closing lines are short, deliberate beats in the source copy.
+              Run together as one paragraph they read as filler, so they get
+              their own emphasis instead. */}
+          {section.bodyHtml && (
+            <Reveal delay={0.2}>
+              <div
+                className="contact-closing mt-6"
+                dangerouslySetInnerHTML={{ __html: section.bodyHtml }}
+              />
             </Reveal>
           )}
+          <Reveal delay={0.24}>
+            <div className="mt-9 grid gap-6 sm:grid-cols-2">
+              {contactEmail && (
+                <div>
+                  <h3 className="contact-aside-title">Have a Career Question?</h3>
+                  <a
+                    href={`mailto:${contactEmail}`}
+                    className="tap-link mt-2 inline-flex text-[0.9rem] text-[var(--text-secondary)] transition-colors hover:text-[var(--accent)]"
+                  >
+                    {contactEmail}
+                  </a>
+                </div>
+              )}
+              {section.ctaPrimary && (
+                <div>
+                  <h3 className="contact-aside-title">Looking for Open Roles?</h3>
+                  <div className="mt-3">
+                    <ButtonLink href={section.ctaPrimary.href}>
+                      {section.ctaPrimary.label} &nbsp;
+                      <ArrowIcon />
+                    </ButtonLink>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Reveal>
         </div>
         <Reveal direction="right" delay={0.16}>
           <ContactForm />

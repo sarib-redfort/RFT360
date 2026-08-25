@@ -50,10 +50,13 @@ const REQUIRES_DATA = new Set<string>([
 export function SectionRenderer({
   section,
   stats,
+  contactEmail,
 }: {
   section: HomepageSection;
   /** Passed to the hero so it can render the original's inline stat row. */
   stats?: StatItem[];
+  /** Careers address, shown beside the contact form. */
+  contactEmail?: string | null;
 }) {
   if (REQUIRES_DATA.has(section.type) && !(Array.isArray(section.data) && section.data.length > 0)) {
     return null;
@@ -81,7 +84,7 @@ export function SectionRenderer({
     case HomepageSectionType.LATEST_BLOGS:
       return <LatestBlogsSection section={section} />;
     case HomepageSectionType.CONTACT_FORM:
-      return <ContactFormSection section={section} />;
+      return <ContactFormSection section={section} contactEmail={contactEmail} />;
     case HomepageSectionType.TEAM:
       return <TeamSection section={section} />;
     case HomepageSectionType.STATISTICS:

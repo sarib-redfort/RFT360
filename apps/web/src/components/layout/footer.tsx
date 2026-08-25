@@ -37,8 +37,8 @@ const FALLBACK_COLUMN = {
 /**
  * Site footer.
  *
- * Four-column layout on desktop (brand → explore → careers → contact),
- * collapsing to two columns on tablet and one on mobile. Content is CMS-driven
+ * Five-column layout on desktop (brand → explore → careers → disciplines →
+ * contact), collapsing to two columns on tablet and one on mobile. Content is CMS-driven
  * via site settings + footer navigation, falling back to the planner pages when
  * no footer menu has been configured.
  */
@@ -54,12 +54,13 @@ export function Footer({
 
   /*
    * Link columns come entirely from CMS footer navigation (Admin → Navigation):
-   * each top-level FOOTER item is a column, its children are the links. Two are
-   * rendered to keep the four-column grid balanced.
+   * each top-level FOOTER item is a column, its children are the links. Three
+   * are rendered, matching the Explore / Careers / Disciplines grouping in the
+   * source copy.
    */
   const columns = footerNav
     .filter((item) => item.children && item.children.length > 0)
-    .slice(0, 2)
+    .slice(0, 3)
     .map((item) => ({
       label: item.label,
       links: (item.children ?? []).map((c) => ({ label: c.label, href: c.href ?? '#' })),
@@ -83,11 +84,16 @@ export function Footer({
       />
 
       <div className="container-rft relative py-16 md:py-20">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr] lg:gap-12">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr] lg:gap-12">
           {/* ── Brand ─────────────────────────────────────────── */}
           <div>
             <Logo />
-            <p className="mt-5 max-w-sm text-[0.875rem] leading-[1.75] text-[var(--text-secondary)]">
+            {settings.tagline && (
+              <p className="mt-4 max-w-sm text-[0.8rem] font-semibold uppercase tracking-[1.5px] text-[var(--accent)]">
+                {settings.tagline}
+              </p>
+            )}
+            <p className="mt-4 max-w-sm text-[0.875rem] leading-[1.75] text-[var(--text-secondary)]">
               {settings.footerText ??
                 'Careers, culture and life at RFT360 — the people we work with and the work we do together.'}
             </p>
@@ -159,10 +165,15 @@ export function Footer({
       {/* ── Bottom bar ─────────────────────────────────────────── */}
       <div className="relative border-t border-[var(--border)]">
         <div className="container-rft flex flex-col items-center justify-between gap-3 py-6 text-[0.75rem] text-[var(--text-muted)] md:flex-row">
-          <p>{settings.copyrightText ?? `© ${year} RFT360. All rights reserved.`}</p>
-          <p className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" aria-hidden />
-            Careers & culture at RFT360
+          <p>{settings.copyrightText ?? `© ${year} RFT 360. All Rights Reserved.`}</p>
+          <p className="flex items-center gap-3">
+            <Link href="/privacy-policy" className="tap-link transition-colors hover:text-[var(--text-primary)]">
+              Privacy Policy
+            </Link>
+            <span aria-hidden className="text-[var(--text-muted)]">|</span>
+            <Link href="/terms" className="tap-link transition-colors hover:text-[var(--text-primary)]">
+              Terms &amp; Conditions
+            </Link>
           </p>
         </div>
       </div>
@@ -190,8 +201,11 @@ function FooterColumn({
     <div>
       <FooterHeading>{title}</FooterHeading>
       <ul className="mt-5 space-y-3 sm:space-y-2">
-        {links.map((link) => (
-          <li key={`${title}-${link.href}`}>
+        {links.map((link, i) => (
+          /* Keyed by label, not href: a column can legitimately point several
+             entries at the same anchor — the Disciplines list all link to the
+             disciplines section — and href alone then collides. */
+          <li key={`${title}-${link.label}-${i}`}>
             <Link
               href={link.href}
               className="tap-link text-[0.875rem] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"

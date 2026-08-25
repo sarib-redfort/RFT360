@@ -77,6 +77,18 @@ export function HeroSection({
               </Reveal>
             )}
 
+            {/* Supporting copy. Kept narrow and quiet so it supports the
+                headline rather than competing with it — the hero stays a
+                single focal point even with the full source text present. */}
+            {section.bodyHtml && (
+              <Reveal delay={0.2}>
+                <div
+                  className="hero-body mt-5 max-w-[34rem]"
+                  dangerouslySetInnerHTML={{ __html: section.bodyHtml }}
+                />
+              </Reveal>
+            )}
+
             {/* Stacked and full-bleed on a phone — side-by-side buttons size to
                 their label there, which left the two CTAs visibly ragged. */}
             <Reveal delay={0.24}>

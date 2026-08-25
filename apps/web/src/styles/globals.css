@@ -610,7 +610,18 @@
     align-items: center;
     gap: 0.75rem;
     text-align: center;
-    padding: 2rem 1rem;
+    padding: 2rem 1.25rem;
+    /* Each tile carries its own border now. Seven items in a four-up hairline
+       grid left a phantom empty cell where the eighth would have been. */
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--bg-card);
+    transition: var(--transition);
+  }
+  .ind-cell:hover {
+    border-color: var(--border-accent);
+    background: var(--bg-card-hover);
+    transform: translateY(-3px);
   }
   .ind-icon {
     width: 48px;
@@ -634,6 +645,46 @@
     font-weight: 700;
     color: color-mix(in srgb, var(--text-primary) 55%, transparent);
     letter-spacing: 0.5px;
+  }
+  /* Supporting line under an industry name. Deliberately quiet and capped in
+     width so the tiles stay a scannable grid rather than a wall of paragraphs. */
+  .ind-desc {
+    font-size: 0.76rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    max-width: 24ch;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+
+  /* Closing beats of the contact copy: short, deliberate lines that carry more
+     weight than body text but must not compete with the display heading. */
+  .contact-closing p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .contact-closing p + p {
+    margin-top: 0.35rem;
+  }
+  .contact-aside-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* Hero supporting paragraphs: smaller and dimmer than the lead line, so the
+     headline keeps the focus even with several sentences present. */
+  .hero-body p {
+    font-size: 0.925rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+  }
+  .hero-body p + p {
+    margin-top: 0.6rem;
   }
 
   /* ============================================================================

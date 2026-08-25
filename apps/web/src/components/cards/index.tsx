@@ -40,18 +40,50 @@ export function ServiceCard({ service, index }: { service: ServiceItem; index?: 
           {service.shortDescription}
         </p>
       )}
+      {service.features && service.features.length > 0 && <ServiceFeatures items={service.features} />}
     </div>
+  );
+}
+
+/**
+ * The technology line under a discipline ("Work with: AWS • Azure • …").
+ *
+ * By convention the first entry is a LABEL when it ends in a colon, because the
+ * source copy varies it per discipline ("Work with:" vs "Focus on:"). Keeping
+ * that in the data avoids a schema column for what is really one word of copy.
+ */
+function ServiceFeatures({ items }: { items: string[] }) {
+  const hasLabel = items[0]?.trimEnd().endsWith(':');
+  const label = hasLabel ? items[0] : 'Work with:';
+  const values = hasLabel ? items.slice(1) : items;
+  if (values.length === 0) return null;
+
+  return (
+    <p className="mt-4 text-[0.75rem] leading-[1.7] text-[var(--text-muted)]">
+      <span className="font-semibold text-[var(--text-secondary)]">{label} </span>
+      {values.map((v, i) => (
+        <span key={v}>
+          {i > 0 && <span className="mx-1.5 text-[var(--border-accent)]">•</span>}
+          {v}
+        </span>
+      ))}
+    </p>
   );
 }
 
 /** Industries grid cell — ports `.ind-card`. */
 export function IndustryTile({ industry }: { industry: IndustryItem }) {
   return (
-    <div className="grid-cell ind-cell">
+    <div className="ind-cell">
       <div className="ind-icon">
         <Icon name={industry.icon} />
       </div>
       <span>{industry.name}</span>
+      {/* Each industry carries a line explaining what we build for it; without
+          this the tile is just a logo wall and that copy never reaches the page. */}
+      {industry.description && (
+        <p className="ind-desc">{industry.description}</p>
+      )}
     </div>
   );
 }

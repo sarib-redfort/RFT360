@@ -1,6 +1,7 @@
 import { CACHE_TAGS } from '@rft360/shared';
 import { apiGet } from '@/lib/api';
 import { getStatistics } from '@/lib/content';
+import { getSettings } from '@/lib/site';
 import type { HomepageComposite } from '@/lib/content-types';
 import { SectionRenderer } from '@/components/sections/section-renderer';
 import { HomeFallback } from '@/components/sections/home-fallback';
@@ -15,9 +16,10 @@ import { OrganizationJsonLd } from '@/components/seo/json-ld';
  * `homepage` tag and revalidated on publish.
  */
 export default async function HomePage() {
-  const [composite, stats] = await Promise.all([
+  const [composite, stats, settings] = await Promise.all([
     apiGet<HomepageComposite>('/homepage', { tags: [CACHE_TAGS.homepage] }),
     getStatistics().catch(() => []),
+    getSettings().catch(() => null),
   ]);
 
   const sections = composite?.sections ?? [];
@@ -27,7 +29,12 @@ export default async function HomePage() {
       <OrganizationJsonLd />
       {sections.length > 0 ? (
         sections.map((section) => (
-          <SectionRenderer key={section.id} section={section} stats={stats} />
+          <SectionRenderer
+              key={section.id}
+              section={section}
+              stats={stats}
+              contactEmail={settings?.contactEmail}
+            />
         ))
       ) : (
         // Shown only when the API is unreachable/unseeded, so the site never 500s.

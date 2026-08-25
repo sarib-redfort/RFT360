@@ -133,7 +133,7 @@ export const services = [
     shortDescription:
       'Design, deploy, and optimize cloud environments built for scalability, reliability, and performance.',
     icon: 'fa-solid fa-cloud',
-    features: ['AWS', 'Azure', 'Google Cloud', 'Cloud Architecture'],
+    features: ['Work with:', 'AWS', 'Azure', 'Google Cloud', 'Cloud Architecture'],
     isFeatured: true,
   },
   {
@@ -142,7 +142,7 @@ export const services = [
     shortDescription:
       'Build smarter development and infrastructure workflows through automation, CI/CD, and modern DevOps practices.',
     icon: 'fa-solid fa-infinity',
-    features: ['CI/CD', 'Jenkins', 'GitLab', 'Docker', 'Kubernetes', 'IaC'],
+    features: ['Work with:', 'CI/CD', 'Jenkins', 'GitLab', 'Docker', 'Kubernetes', 'IaC'],
     isFeatured: true,
   },
   {
@@ -151,7 +151,7 @@ export const services = [
     shortDescription:
       'Help organizations protect their infrastructure, applications, systems, and data against evolving security threats.',
     icon: 'fa-solid fa-shield-halved',
-    features: ['Cloud Security', 'Infrastructure Security', 'Monitoring', 'Access Management'],
+    features: ['Work with:', 'Cloud Security', 'Infrastructure Security', 'Monitoring', 'Access Management'],
     isFeatured: true,
   },
   {
@@ -160,7 +160,7 @@ export const services = [
     shortDescription:
       'Work on powerful computing environments designed for complex, data-intensive, and computationally demanding workloads.',
     icon: 'fa-solid fa-microchip',
-    features: ['Linux', 'SLURM', 'PBS', 'OpenHPC', 'HPC Infrastructure'],
+    features: ['Work with:', 'Linux', 'SLURM', 'PBS', 'OpenHPC', 'HPC Infrastructure'],
     isFeatured: true,
   },
   {
@@ -169,7 +169,7 @@ export const services = [
     shortDescription:
       'Design and maintain the systems that keep modern businesses connected, reliable, and operational.',
     icon: 'fa-solid fa-server',
-    features: ['Linux', 'Servers', 'Networking', 'Infrastructure Monitoring'],
+    features: ['Work with:', 'Linux', 'Servers', 'Networking', 'Infrastructure Monitoring'],
     isFeatured: true,
   },
   {
@@ -178,7 +178,7 @@ export const services = [
     shortDescription:
       'Support the teams, processes, and systems that turn technical expertise into reliable business outcomes.',
     icon: 'fa-solid fa-gears',
-    features: ['Operations', 'Project Coordination', 'Technical Support', 'Business Technology'],
+    features: ['Focus on:', 'Operations', 'Project Coordination', 'Technical Support', 'Business Technology'],
     isFeatured: true,
   },
 ];
@@ -571,6 +571,17 @@ export const footerColumns = [
       { label: 'Employee Stories', href: '/blogs' },
     ],
   },
+  {
+    label: 'Disciplines',
+    children: [
+      { label: 'Cloud Engineering', href: '/#services' },
+      { label: 'DevOps & Automation', href: '/#services' },
+      { label: 'Cybersecurity', href: '/#services' },
+      { label: 'High-Performance Computing', href: '/#services' },
+      { label: 'IT Infrastructure', href: '/#services' },
+      { label: 'Technology & Operations', href: '/#services' },
+    ],
+  },
 ];
 
 /** Navigation — the eight planner pages, in order. */
@@ -664,6 +675,13 @@ export const homepageSections = [
     headingAccent: 'Build Your Career at RFT 360.',
     subheading:
       'Where technology challenges become opportunities — and careers become long-term journeys.',
+    bodyHtml:
+      '<p>At RFT 360, we bring together engineers, technologists, problem-solvers, and ' +
+      'innovators to build secure, scalable, and high-performance technology solutions.</p>' +
+      '<p>Whether your expertise is in Cloud, DevOps, Cybersecurity, HPC, AI, or IT ' +
+      'infrastructure, you’ll have the opportunity to work on meaningful technology ' +
+      'challenges and grow with a team that values expertise, ownership, and continuous ' +
+      'learning.</p>',
     ctaPrimary: { label: 'Explore Open Positions', href: '/careers', variant: 'primary' },
     ctaSecondary: { label: 'Meet the Team', href: '/about-culture', variant: 'outline' },
   },
@@ -713,9 +731,9 @@ export const homepageSections = [
     heading: 'The Industries We',
     headingAccent: 'Build For',
     subheading:
-      'Technology doesn’t exist in isolation. It powers the businesses, systems, and industries ' +
-      'people depend on every day. RFT 360 works across technology-driven industries where ' +
-      'reliability, performance, security, and scalability matter.',
+      'Technology doesn’t exist in isolation. It powers the businesses, systems, and ' +
+      'industries people depend on every day. RFT 360 works across technology-driven ' +
+      'industries where reliability, performance, security, and scalability matter.',
     itemLimit: 7,
   },
   {
@@ -763,9 +781,10 @@ export const homepageSections = [
     headingAccent: 'Next Chapter?',
     subheading:
       'Whether you’re an experienced engineer, an ambitious graduate, or a technology ' +
-      'professional looking for your next challenge, we’d like to hear from you. ' +
-      'Bring your skills. Bring your curiosity. Bring your ambition. ' +
-      'Let’s build what’s next — together.',
+      'professional looking for your next challenge, we’d like to hear from you.',
+    bodyHtml:
+      '<p>Bring your skills. Bring your curiosity. Bring your ambition.</p>' +
+      '<p>Let’s build what’s next — together.</p>',
     ctaPrimary: { label: 'View Current Openings', href: '/careers', variant: 'primary' },
   },
 ];
