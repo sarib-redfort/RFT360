@@ -62,11 +62,8 @@ tmp/
 temp/
 planner_extracted.txt
 
-# Internal reference documents — the brand guide, business portfolio and
-# planning doc are confidential. This repo is public, so they stay local.
-# Their requirements are captured in CLAUDE.md / README.md instead.
+# Internal reference documents (brand guide, business portfolio, planning docs)
+# are confidential and stay out of the repository. The requirements they carry
+# are captured in CONTRIBUTING.md / README.md instead.
 *.pdf
 *.docx
-
-# Local assistant/editor state
-.claude/

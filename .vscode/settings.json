@@ -13,7 +13,6 @@
     "**/node_modules": true,
     "**/dist": true,
     "**/.next": true,
-    "**/.turbo": true,
-    "rft360 - Copy/**": true
+    "**/.turbo": true
   }
 }
