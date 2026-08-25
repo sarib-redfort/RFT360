@@ -58,7 +58,7 @@ function SplitHeader({
 }) {
   return (
     <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-      <div>
+      <div className="max-w-3xl">
         {eyebrow && (
           <Reveal>
             <Eyebrow>{eyebrow}</Eyebrow>
@@ -69,12 +69,15 @@ function SplitHeader({
             {heading} {accent && <span className="text-accent-grad">{accent}</span>}
           </h2>
         </Reveal>
+        {/* Directly under the heading it belongs to. Right-aligned in a facing
+            column it read as a detached caption and broke the reading order —
+            the eye met the supporting sentence before the headline. */}
+        {lede && (
+          <Reveal delay={0.16}>
+            <p className="body-text mt-5 max-w-[46rem]">{lede}</p>
+          </Reveal>
+        )}
       </div>
-      {lede && (
-        <Reveal delay={0.16}>
-          <p className="body-text max-w-[360px] md:text-right">{lede}</p>
-        </Reveal>
-      )}
       {action && (
         <Reveal delay={0.16}>
           <div className="whitespace-nowrap">{action}</div>
@@ -89,12 +92,24 @@ function SplitHeader({
  * original's "growth" split, complete with the floating stat card). Falls back
  * to a text-only two-column layout when no image is set.
  */
+/**
+ * Stable DOM anchor for a homepage section.
+ *
+ * Menus and footer links point at `/#services`, `/#industries` and so on. Until
+ * now no section rendered an `id`, so every one of those links silently landed
+ * at the top of the page — a dead link that looks like it works.
+ */
+export function sectionAnchor(type: string): string {
+  return type.toLowerCase().replace(/_/g, '-');
+}
+
 export function WhoWeAreSection({ section }: { section: HomepageSection }) {
   const image = mediaSrc(section.image, 'large');
 
   return (
     <Section
-      label={section.name}
+      id={sectionAnchor(section.type)}
+        label={section.name}
       tone="surface"
       topRule="muted"
       glow
@@ -182,7 +197,7 @@ export function WhoWeAreSection({ section }: { section: HomepageSection }) {
 export function ServicesSection({ section }: { section: HomepageSection }) {
   const items = (section.data as ServiceItem[]) ?? [];
   return (
-    <Section label={section.name} topRule="accent" glow glowStyle={{ top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400 }}>
+    <Section id={sectionAnchor(section.type)} label={section.name} topRule="accent" glow glowStyle={{ top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400 }}>
       <SplitHeader
         eyebrow={section.eyebrow}
         heading={section.heading}
@@ -214,7 +229,7 @@ export function IndustriesSection({ section }: { section: HomepageSection }) {
   const items = (section.data as IndustryItem[]) ?? [];
   const creds = (section.settings?.credentials as string[] | undefined) ?? [];
   return (
-    <Section label={section.name} topRule="accent" glow glowStyle={{ bottom: -100, right: -100, width: 600, height: 500 }}>
+    <Section id={sectionAnchor(section.type)} label={section.name} topRule="accent" glow glowStyle={{ bottom: -100, right: -100, width: 600, height: 500 }}>
       <SplitHeader
         eyebrow={section.eyebrow}
         heading={section.heading}
@@ -255,7 +270,7 @@ export function WhyChooseUsSection({ section }: { section: HomepageSection }) {
     (section.settings?.metrics as { label: string; value: string }[] | undefined) ?? [];
 
   return (
-    <Section label={section.name} tone="surface" topRule="muted" glow glowStyle={{ right: -100, top: '50%', transform: 'translateY(-50%)', width: 500, height: 500 }}>
+    <Section id={sectionAnchor(section.type)} label={section.name} tone="surface" topRule="muted" glow glowStyle={{ right: -100, top: '50%', transform: 'translateY(-50%)', width: 500, height: 500 }}>
       {metrics.length > 0 ? (
         <div className="grid-2">
           <div>
@@ -317,7 +332,7 @@ export function WhyChooseUsSection({ section }: { section: HomepageSection }) {
 export function CaseStudiesSection({ section }: { section: HomepageSection }) {
   const items = (section.data as CaseStudyItem[]) ?? [];
   return (
-    <Section label={section.name} topRule="accent" glow>
+    <Section id={sectionAnchor(section.type)} label={section.name} topRule="accent" glow>
       <SplitHeader
         eyebrow={section.eyebrow}
         heading={section.heading}
@@ -338,7 +353,7 @@ export function CaseStudiesSection({ section }: { section: HomepageSection }) {
 export function TestimonialsSection({ section }: { section: HomepageSection }) {
   const items = (section.data as TestimonialItem[]) ?? [];
   return (
-    <Section label={section.name} tone="surface" topRule="muted" glow>
+    <Section id={sectionAnchor(section.type)} label={section.name} tone="surface" topRule="muted" glow>
       <SectionHeading
         eyebrow={section.eyebrow ?? undefined}
         heading={section.heading ?? ''}
@@ -347,7 +362,7 @@ export function TestimonialsSection({ section }: { section: HomepageSection }) {
         align="center"
       />
       <Reveal delay={0.16} className="mt-10">
-        <div className="hairline-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {items.map((t) => (
             <TestimonialCard key={t.id} testimonial={t} />
           ))}
@@ -360,7 +375,7 @@ export function TestimonialsSection({ section }: { section: HomepageSection }) {
 export function FaqSection({ section }: { section: HomepageSection }) {
   const items = (section.data as FaqItem[]) ?? [];
   return (
-    <Section label={section.name} topRule="accent" containerSize="narrow">
+    <Section id={sectionAnchor(section.type)} label={section.name} topRule="accent" containerSize="narrow">
       <SectionHeading
         eyebrow={section.eyebrow ?? undefined}
         heading={section.heading ?? ''}
@@ -390,7 +405,7 @@ export function FaqSection({ section }: { section: HomepageSection }) {
 export function LatestBlogsSection({ section }: { section: HomepageSection }) {
   const items = (section.data as PostItem[]) ?? [];
   return (
-    <Section label={section.name} tone="surface" topRule="muted" glow>
+    <Section id={sectionAnchor(section.type)} label={section.name} tone="surface" topRule="muted" glow>
       <SplitHeader
         eyebrow={section.eyebrow}
         heading={section.heading}
@@ -415,7 +430,7 @@ export function LatestBlogsSection({ section }: { section: HomepageSection }) {
 export function TeamSection({ section }: { section: HomepageSection }) {
   const items = (section.data as TeamMemberItem[]) ?? [];
   return (
-    <Section label={section.name} topRule="muted" glow>
+    <Section id={sectionAnchor(section.type)} label={section.name} topRule="muted" glow>
       <SplitHeader
         eyebrow={section.eyebrow}
         heading={section.heading}
@@ -436,7 +451,7 @@ export function TeamSection({ section }: { section: HomepageSection }) {
 export function StatisticsSection({ section }: { section: HomepageSection }) {
   const items = (section.data as StatItem[]) ?? [];
   return (
-    <Section label={section.name} tone="surface" topRule="accent" fullHeight={false}>
+    <Section id={sectionAnchor(section.type)} label={section.name} tone="surface" topRule="accent" fullHeight={false}>
       <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((stat, i) => (
           <Reveal key={stat.id} delay={(i % 4) * 0.08}>
@@ -454,7 +469,7 @@ export function StatisticsSection({ section }: { section: HomepageSection }) {
 export function LogosSection({ section }: { section: HomepageSection }) {
   const items = (section.data as LogoItem[]) ?? [];
   return (
-    <Section label={section.name} tone="surface" fullHeight={false}>
+    <Section id={sectionAnchor(section.type)} label={section.name} tone="surface" fullHeight={false}>
       {section.heading && (
         <p className="text-center text-[0.7rem] font-bold uppercase tracking-[3px] text-[var(--text-muted)]">
           {section.heading}
@@ -474,7 +489,7 @@ export function LogosSection({ section }: { section: HomepageSection }) {
 export function CertificationsSection({ section }: { section: HomepageSection }) {
   const items = (section.data as CertificationItem[]) ?? [];
   return (
-    <Section label={section.name} topRule="muted" fullHeight={false}>
+    <Section id={sectionAnchor(section.type)} label={section.name} topRule="muted" fullHeight={false}>
       <SectionHeading
         eyebrow={section.eyebrow ?? undefined}
         heading={section.heading ?? ''}
@@ -495,7 +510,7 @@ export function CertificationsSection({ section }: { section: HomepageSection })
 export function AwardsSection({ section }: { section: HomepageSection }) {
   const items = (section.data as AwardItem[]) ?? [];
   return (
-    <Section label={section.name} tone="surface" topRule="accent">
+    <Section id={sectionAnchor(section.type)} label={section.name} tone="surface" topRule="accent">
       <SectionHeading
         eyebrow={section.eyebrow ?? undefined}
         heading={section.heading ?? ''}
@@ -531,7 +546,7 @@ export function ContactFormSection({
   contactEmail?: string | null;
 }) {
   return (
-    <Section label={section.name} topRule="accent" glow glowStyle={{ top: '50%', right: -200, transform: 'translateY(-50%)', width: 700, height: 600 }}>
+    <Section id={sectionAnchor(section.type)} label={section.name} topRule="accent" glow glowStyle={{ top: '50%', right: -200, transform: 'translateY(-50%)', width: 700, height: 600 }}>
       <div className="grid items-start gap-16 lg:grid-cols-2">
         <div>
           {section.eyebrow && (
@@ -604,7 +619,7 @@ export function ContactFormSection({
 /** Generic rich-text / CTA block. */
 export function RichTextSection({ section }: { section: HomepageSection }) {
   return (
-    <Section label={section.name} containerSize="narrow">
+    <Section id={sectionAnchor(section.type)} label={section.name} containerSize="narrow">
       <div className="text-center">
         <SectionHeading
           eyebrow={section.eyebrow ?? undefined}

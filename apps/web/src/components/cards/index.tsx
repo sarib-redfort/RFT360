@@ -131,10 +131,14 @@ export function TeamCard({ member }: { member: TeamMemberItem }) {
 }
 
 /** Testimonial grid cell. */
+/**
+ * Quote card. Carries its own border rather than sitting in a hairline grid:
+ * five quotes in a three-up grid otherwise leave a phantom empty cell.
+ */
 export function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
   const avatar = mediaSrc(testimonial.avatar, 'thumbnail');
   return (
-    <figure className="grid-cell flex h-full flex-col px-8 py-9">
+    <figure className="card flex h-full flex-col px-8 py-9">
       <Icon name="fa-solid fa-quote-left" className="text-xl text-[var(--accent)]" />
       <blockquote className="mt-4 flex-1 text-[0.925rem] leading-[1.75] text-[var(--text-primary)]">
         “{testimonial.quote}”

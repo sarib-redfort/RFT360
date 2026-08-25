@@ -141,6 +141,9 @@ async function seedSettings() {
       'Build what’s next. Build your career at RFT 360 — where technology challenges become ' +
       'opportunities and careers become long-term journeys.',
     contactEmail: 'careers@redfortech.com',
+    socialLinkedin: 'https://www.linkedin.com/company/rft360',
+    socialFacebook: 'https://www.facebook.com/rft360',
+    socialInstagram: 'https://www.instagram.com/rft360',
   };
 
   const existing = await prisma.siteSettings.findFirst();
@@ -227,10 +230,14 @@ async function seedPages() {
     await prisma.page.upsert({
       where: { slug: page.slug },
       update: shipped({
+        title: page.title,
         eyebrow: page.eyebrow,
         heading: page.heading,
         headingAccent: (page as { headingAccent?: string }).headingAccent ?? null,
         subheading: page.subheading,
+        // Body copy is shipped default text too; omitting it here meant a
+        // refresh updated a page's hero and left its body on the old wording.
+        bodyHtml: (page as { bodyHtml?: string }).bodyHtml ?? null,
       }),
       create: { ...page, ...PUBLISHED },
     });
@@ -338,7 +345,17 @@ async function seedTestimonialsAndFaqs() {
   for (const [i, t] of data.testimonials.entries()) {
     await prisma.testimonial.upsert({
       where: { id: `testimonial-${i}` },
-      update: shipped({ ...t }),
+      /*
+       * Optional fields are nulled explicitly. Spreading alone only sets keys
+       * present in the new data, so a testimonial that dropped its job title
+       * kept the old one — leaving "Engineering Team / Senior Software
+       * Engineer" stitched together from two different sets of copy.
+       */
+      update: shipped({
+        authorRole: null,
+        authorCompany: null,
+        ...t,
+      }),
       create: { id: `testimonial-${i}`, ...t, order: i, ...PUBLISHED },
     });
   }

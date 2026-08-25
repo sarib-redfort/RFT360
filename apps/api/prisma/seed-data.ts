@@ -660,7 +660,35 @@ export const pages = [
     subheading:
       'Questions about careers, culture or RedFort in general? We would love to hear from you.',
   },
-];
+  {
+    slug: 'privacy-policy',
+    title: 'Privacy Policy',
+    eyebrow: 'Legal',
+    heading: 'Privacy',
+    headingAccent: 'Policy',
+    subheading: 'How RFT 360 collects, uses and protects the information you share with us.',
+    /*
+     * Placeholder. The source content document does not supply legal copy, and
+     * inventing a privacy policy would be worse than an obvious gap — replace
+     * this in Admin -> Pages with text your legal contact has approved.
+     */
+    bodyHtml:
+      '<p><strong>This policy is awaiting final copy.</strong> Replace it in the CMS ' +
+      'before launch.</p><p>Questions about your data can be sent to ' +
+      '<a href="mailto:careers@redfortech.com">careers@redfortech.com</a>.</p>',
+  },
+  {
+    slug: 'terms',
+    title: 'Terms & Conditions',
+    eyebrow: 'Legal',
+    heading: 'Terms &',
+    headingAccent: 'Conditions',
+    subheading: 'The terms that apply when you use this website and apply for a role.',
+    bodyHtml:
+      '<p><strong>These terms are awaiting final copy.</strong> Replace them in the CMS ' +
+      'before launch.</p><p>Questions can be sent to ' +
+      '<a href="mailto:careers@redfortech.com">careers@redfortech.com</a>.</p>',
+  },];
 
 /**
  * Homepage sections in the planner's mandated order. `type` drives which linked

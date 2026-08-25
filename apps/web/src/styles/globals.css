@@ -169,6 +169,9 @@
     align-items: center;
     overflow: hidden;
     padding: 5rem 0 0;
+    /* Anchored jumps (#services, #industries) must clear the fixed navbar,
+       or the section's heading lands underneath it. */
+    scroll-margin-top: 5rem;
   }
 
   /* Hairline rule that tops most sections. */
