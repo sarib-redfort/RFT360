@@ -2,7 +2,7 @@
 
 /* ============================================================================
    RFT360 DESIGN SYSTEM
-   A faithful port of the original static design (rft360 - Copy/css/style.css).
+   A faithful port of the original static RFT360 design.
    Token values, spacing, effects and animations are carried over verbatim.
 
    ONE deliberate change: the accent red is the brand-guide value #DE181B
@@ -159,7 +159,7 @@
   /* ============================================================================
      SECTIONS  (.scroll-section)
      Full-viewport height and vertically centred, exactly like the original.
-     Scroll-snap itself is intentionally omitted (see CLAUDE.md) — the visual
+     Scroll-snap itself is intentionally omitted (see CONTRIBUTING.md) — the visual
      result is identical, but long lists stay readable.
      ============================================================================ */
   .scroll-section {

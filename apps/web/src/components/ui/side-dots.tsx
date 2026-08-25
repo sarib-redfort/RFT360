@@ -66,7 +66,15 @@ export function SideDots() {
     <nav className="side-dots" aria-label="Section navigation">
       {dots.map((dot, i) => (
         <button
-          key={dot.id}
+          /*
+           * Keyed by index, not by `dot.id`. Ids come from whatever
+           * `.scroll-section` elements exist in the DOM at collect time, and
+           * during a route transition two pages' sections briefly coexist —
+           * which produced duplicate `hero` keys. The list is positional
+           * anyway (clicking dot i scrolls to sections[i]), so the index is
+           * the honest identity here.
+           */
+          key={`${i}-${dot.id}`}
           type="button"
           data-label={dot.label}
           aria-label={`Go to ${dot.label}`}

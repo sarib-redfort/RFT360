@@ -230,4 +230,4 @@ Pre-launch checklist:
 CI (`.github/workflows/ci.yml`) runs typecheck · lint · test · build against a
 throwaway Postgres + Redis.
 
-See [CLAUDE.md](CLAUDE.md) for architecture conventions and where things live.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for architecture conventions and where things live.

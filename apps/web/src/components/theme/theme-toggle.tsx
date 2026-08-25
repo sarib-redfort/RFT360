@@ -18,7 +18,16 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
   return (
     <button
       type="button"
-      aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+      /*
+       * Gated on `mounted` like the icon below. The server cannot know the
+       * stored theme, so `resolvedTheme` is undefined there and `isDark` is
+       * false — rendering "Switch to dark theme" on the server and
+       * "Switch to light theme" on the client, which React reports as a
+       * hydration mismatch and refuses to patch up.
+       */
+      aria-label={
+        !mounted ? 'Toggle theme' : isDark ? 'Switch to light theme' : 'Switch to dark theme'
+      }
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className={`tap-target inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-accent)] hover:text-[var(--text-primary)] ${className}`}
     >

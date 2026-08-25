@@ -1,6 +1,6 @@
-# CLAUDE.md — RFT360
+# Contributing to RFT360
 
-Guidance for working in this repo. Read alongside `README.md`.
+Conventions for working in this repo. Read alongside `README.md`.
 
 ## What this is
 

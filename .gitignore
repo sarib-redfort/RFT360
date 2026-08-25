@@ -67,3 +67,6 @@ planner_extracted.txt
 # Their requirements are captured in CLAUDE.md / README.md instead.
 *.pdf
 *.docx
+
+# Local assistant/editor state
+.claude/
