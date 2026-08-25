@@ -6,7 +6,7 @@
  * Creates the first admin, global settings, navigation, all content types and
  * the planner's homepage sections.
  */
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { ContentStatus } from '@rft360/shared';
 import * as data from './seed-data';
@@ -104,17 +104,20 @@ async function seedSettings() {
   // a parent-company name) actually reach the live site instead of being
   // stranded in the database. Operational fields below are create-only.
   const branding = {
-    siteName: 'RFT360',
-    tagline: 'Build Your Career at RFT360',
+    siteName: 'RFT 360',
+    tagline: 'Building Technology. Growing People. Creating What’s Next.',
     description:
-      'Careers, culture and life at RFT360 — meet the teams and find your next role.',
+      'RFT 360 brings together technology expertise across Cloud, DevOps, Cybersecurity, HPC, ' +
+      'and IT Infrastructure to solve complex challenges for modern businesses.',
     footerText:
-      'RFT360 is where we share our culture, our people and the careers we build together.',
-    copyrightText: `© ${new Date().getFullYear()} RFT360. All rights reserved.`,
-    metaTitle: 'RFT360 — Careers & Culture',
+      'RFT 360 brings together technology expertise across Cloud, DevOps, Cybersecurity, HPC, ' +
+      'and IT Infrastructure to solve complex challenges for modern businesses.',
+    copyrightText: `© ${new Date().getFullYear()} RFT 360. All Rights Reserved.`,
+    metaTitle: 'RFT 360 — Careers',
     metaDescription:
-      'Explore careers, culture and life at RFT360 — where talented people do the best work of their careers.',
-    addressLine1: 'Gulberg III',
+      'Build what’s next. Build your career at RFT 360 — where technology challenges become ' +
+      'opportunities and careers become long-term journeys.',
+    contactEmail: 'careers@redfortech.com',
   };
 
   const existing = await prisma.siteSettings.findFirst();
@@ -225,18 +228,40 @@ async function seedServicesAndIndustries() {
   for (const [i, service] of data.services.entries()) {
     await prisma.service.upsert({
       where: { slug: service.slug },
-      update: {},
+      update: { ...service },
       create: { ...service, order: i, ...PUBLISHED },
     });
   }
   for (const [i, industry] of data.industries.entries()) {
     await prisma.industry.upsert({
       where: { slug: industry.slug },
-      update: {},
+      update: { ...industry },
       create: { ...industry, order: i, ...PUBLISHED },
     });
   }
-  console.log(`  ✓ Services (${data.services.length}) & industries (${data.industries.length})`);
+
+  /*
+   * These two lists are shipped content keyed by SLUG, so renaming an entry
+   * creates a new row instead of replacing the old one. Left alone, a rename
+   * leaves both versions in the database competing for the same `order`, and
+   * the homepage renders an interleaved mix of old and new under `itemLimit`.
+   * Pruning makes the seed authoritative for what it ships.
+   *
+   * NOTE: this removes services/industries added through the CMS. Add those
+   * back here if they should survive a re-seed.
+   */
+  const removedServices = await prisma.service.deleteMany({
+    where: { slug: { notIn: data.services.map((s) => s.slug) } },
+  });
+  const removedIndustries = await prisma.industry.deleteMany({
+    where: { slug: { notIn: data.industries.map((s) => s.slug) } },
+  });
+
+  const pruned = removedServices.count + removedIndustries.count;
+  console.log(
+    `  ✓ Services (${data.services.length}) & industries (${data.industries.length})` +
+      (pruned > 0 ? ` — pruned ${pruned} superseded` : ''),
+  );
 }
 
 async function seedDepartmentsAndJobs() {
@@ -270,7 +295,7 @@ async function seedTeam() {
   for (const [i, member] of data.teamMembers.entries()) {
     await prisma.teamMember.upsert({
       where: { id: `team-${i}` },
-      update: {},
+      update: { ...member },
       create: { id: `team-${i}`, ...member, order: i, ...PUBLISHED },
     });
   }
@@ -281,7 +306,7 @@ async function seedTestimonialsAndFaqs() {
   for (const [i, t] of data.testimonials.entries()) {
     await prisma.testimonial.upsert({
       where: { id: `testimonial-${i}` },
-      update: {},
+      update: { ...t },
       create: { id: `testimonial-${i}`, ...t, order: i, ...PUBLISHED },
     });
   }
@@ -417,36 +442,45 @@ async function seedBlog() {
 
 async function seedHomepageSections() {
   for (const [i, section] of data.homepageSections.entries()) {
-    await prisma.homepageSection.upsert({
-      where: { id: `section-${section.type}` },
-      // Section copy is a shipped default, so re-seeding refreshes it.
-      // NOTE: that means a re-seed resets headings edited in the CMS — do your
-      // final seed first, then customise copy in Admin -> Homepage.
-      update: {
+      const copy = {
         name: section.name,
-        eyebrow: section.eyebrow,
-        heading: section.heading,
-        headingAccent: section.headingAccent,
-        subheading: section.subheading,
-        ...imagePatch('imageId', (section as { imageKey?: string }).imageKey),
-      },
-      create: {
-        id: `section-${section.type}`,
-        type: section.type,
-        name: section.name,
-        eyebrow: section.eyebrow,
-        heading: section.heading,
-        headingAccent: section.headingAccent,
-        subheading: section.subheading,
+        eyebrow: section.eyebrow ?? null,
+        heading: section.heading ?? null,
+        headingAccent: section.headingAccent ?? null,
+        subheading: section.subheading ?? null,
+        bodyHtml: (section as { bodyHtml?: string }).bodyHtml ?? null,
         itemLimit: section.itemLimit ?? 6,
-        imageId: img((section as { imageKey?: string }).imageKey),
-        ctaPrimary: section.ctaPrimary ?? undefined,
-        ctaSecondary: section.ctaSecondary ?? undefined,
-        isVisible: true,
-        order: i,
-        ...PUBLISHED,
-      },
-    });
+        ctaPrimary: section.ctaPrimary ?? Prisma.DbNull,
+        ctaSecondary: section.ctaSecondary ?? Prisma.DbNull,
+        // Sections absent from the shipped content are hidden, not deleted, so
+        // they can be switched back on in the CMS without re-creating them.
+        isVisible: (section as { isVisible?: boolean }).isVisible ?? true,
+      };
+
+      await prisma.homepageSection.upsert({
+        where: { id: `section-${section.type}` },
+        /*
+         * Section content is a shipped default, so re-seeding refreshes ALL of
+         * it: copy, CTAs, item limits and visibility. Refreshing only some
+         * fields (as this previously did) leaves a half-updated section, e.g. a
+         * new heading above a stale call-to-action.
+         *
+         * NOTE: a re-seed therefore resets homepage copy edited in the CMS. Do
+         * your final seed first, then customise in Admin -> Homepage.
+         */
+        update: {
+          ...copy,
+          ...imagePatch('imageId', (section as { imageKey?: string }).imageKey),
+        },
+        create: {
+          id: `section-${section.type}`,
+          type: section.type,
+          ...copy,
+          imageId: img((section as { imageKey?: string }).imageKey),
+          order: i,
+          ...PUBLISHED,
+        },
+      });
   }
   console.log(`  ✓ Homepage sections (${data.homepageSections.length}, planner order)`);
 }
@@ -467,7 +501,7 @@ async function upsertOrdered<T extends Record<string, unknown>>(
     const id = `${model}-${i}`;
     await delegate.upsert({
       where: { id },
-      update: {},
+      update: { ...item },
       create: { id, ...item, order: i, ...PUBLISHED },
     });
   }

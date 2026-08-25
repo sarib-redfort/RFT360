@@ -81,40 +81,40 @@ export const cultureValues = [
 
 export const perks = [
   {
-    title: 'Competitive Salary',
+    title: 'Learn Continuously',
     description:
-      'Market-leading compensation with annual reviews and performance bonuses that recognise the impact you make.',
-    icon: 'fa-solid fa-sack-dollar',
-  },
-  {
-    title: 'Health & Wellness',
-    description:
-      'Comprehensive health cover for you and your family, plus mental-health support and a wellness stipend.',
-    icon: 'fa-solid fa-heart-pulse',
-  },
-  {
-    title: 'Learning Budget',
-    description:
-      'An annual budget for courses, certifications, books and conferences. Your growth is our investment.',
+      'Technology changes fast. We encourage continuous learning, experimentation, and professional development.',
     icon: 'fa-solid fa-book-open-reader',
   },
   {
-    title: 'Flexible Hours',
+    title: 'Work on Real Problems',
     description:
-      'We care about outcomes, not clock-watching. Flexible timings and a hybrid-friendly culture that respects your life.',
-    icon: 'fa-solid fa-clock',
+      'You won’t just complete tasks. You’ll work on technology challenges that have real business impact.',
+    icon: 'fa-solid fa-lightbulb',
   },
   {
-    title: 'Modern Workspace',
+    title: 'Grow Your Expertise',
     description:
-      'A vibrant office with the latest equipment, collaborative spaces, free meals and endless coffee.',
-    icon: 'fa-solid fa-building-user',
+      'Build deeper expertise while expanding your knowledge across modern technology disciplines.',
+    icon: 'fa-solid fa-chart-line',
   },
   {
-    title: 'Career Growth',
+    title: 'Own Your Work',
     description:
-      'Clear career ladders, regular mentorship, and real opportunities to grow into leadership from within.',
-    icon: 'fa-solid fa-arrow-trend-up',
+      'We value people who take responsibility, solve problems, and bring ideas to the table.',
+    icon: 'fa-solid fa-key',
+  },
+  {
+    title: 'Work With Experts',
+    description:
+      'Collaborate with professionals who bring different technical perspectives and experiences.',
+    icon: 'fa-solid fa-people-group',
+  },
+  {
+    title: 'Build Your Future',
+    description:
+      'Your growth matters to us. We aim to create opportunities for people who want to build a long-term career in technology.',
+    icon: 'fa-solid fa-rocket',
   },
 ];
 
@@ -128,69 +128,108 @@ export const statistics = [
 /** Seeded as "What Our Teams Do" — RedFort's internal disciplines. */
 export const services = [
   {
-    title: 'Engineering',
-    slug: 'engineering',
+    title: 'Cloud Engineering',
+    slug: 'cloud-engineering',
     shortDescription:
-      'Our engineers build robust, high-performance products across web, mobile and cloud using modern stacks.',
-    icon: 'fa-solid fa-code',
-    features: ['Web & Mobile', 'Cloud & DevOps', 'Platform Engineering'],
+      'Design, deploy, and optimize cloud environments built for scalability, reliability, and performance.',
+    icon: 'fa-solid fa-cloud',
+    features: ['AWS', 'Azure', 'Google Cloud', 'Cloud Architecture'],
     isFeatured: true,
   },
   {
-    title: 'Product & Design',
-    slug: 'product-design',
+    title: 'DevOps & Automation',
+    slug: 'devops-automation',
     shortDescription:
-      'Designers and product managers who craft intuitive experiences people genuinely love to use.',
-    icon: 'fa-solid fa-pen-ruler',
-    features: ['UX Research', 'Product Strategy', 'Design Systems'],
+      'Build smarter development and infrastructure workflows through automation, CI/CD, and modern DevOps practices.',
+    icon: 'fa-solid fa-infinity',
+    features: ['CI/CD', 'Jenkins', 'GitLab', 'Docker', 'Kubernetes', 'IaC'],
     isFeatured: true,
   },
   {
-    title: 'Quality Assurance',
-    slug: 'quality-assurance',
+    title: 'Cybersecurity',
+    slug: 'cybersecurity',
     shortDescription:
-      'QA specialists who safeguard quality with rigorous automated and manual testing at every stage.',
-    icon: 'fa-solid fa-vials',
-    features: ['Automation', 'Performance Testing', 'Security Testing'],
+      'Help organizations protect their infrastructure, applications, systems, and data against evolving security threats.',
+    icon: 'fa-solid fa-shield-halved',
+    features: ['Cloud Security', 'Infrastructure Security', 'Monitoring', 'Access Management'],
     isFeatured: true,
   },
   {
-    title: 'Data & AI',
-    slug: 'data-ai',
+    title: 'High-Performance Computing',
+    slug: 'high-performance-computing',
     shortDescription:
-      'Data scientists and ML engineers turning information into intelligent, real-world products.',
-    icon: 'fa-solid fa-brain',
-    features: ['Machine Learning', 'Analytics', 'Data Engineering'],
+      'Work on powerful computing environments designed for complex, data-intensive, and computationally demanding workloads.',
+    icon: 'fa-solid fa-microchip',
+    features: ['Linux', 'SLURM', 'PBS', 'OpenHPC', 'HPC Infrastructure'],
     isFeatured: true,
   },
   {
-    title: 'People & Culture',
-    slug: 'people-culture',
+    title: 'IT Infrastructure',
+    slug: 'it-infrastructure',
     shortDescription:
-      'The team behind our team — hiring brilliant people and nurturing a workplace where they thrive.',
-    icon: 'fa-solid fa-people-arrows',
-    features: ['Talent Acquisition', 'Learning & Development', 'Employee Experience'],
+      'Design and maintain the systems that keep modern businesses connected, reliable, and operational.',
+    icon: 'fa-solid fa-server',
+    features: ['Linux', 'Servers', 'Networking', 'Infrastructure Monitoring'],
     isFeatured: true,
   },
   {
-    title: 'Business Operations',
-    slug: 'business-operations',
+    title: 'Technology & Operations',
+    slug: 'technology-operations',
     shortDescription:
-      'Operations, finance and strategy professionals who keep RedFort running and growing smoothly.',
-    icon: 'fa-solid fa-briefcase',
-    features: ['Strategy', 'Finance', 'Operations'],
+      'Support the teams, processes, and systems that turn technical expertise into reliable business outcomes.',
+    icon: 'fa-solid fa-gears',
+    features: ['Operations', 'Project Coordination', 'Technical Support', 'Business Technology'],
     isFeatured: true,
   },
 ];
 
-/** Seeded as "Domains We Work In". */
 export const industries = [
-  { name: 'Fintech', slug: 'fintech', icon: 'fa-solid fa-credit-card' },
-  { name: 'E-Commerce', slug: 'e-commerce', icon: 'fa-solid fa-cart-shopping' },
-  { name: 'Healthcare', slug: 'healthcare', icon: 'fa-solid fa-house-medical' },
-  { name: 'Education', slug: 'education', icon: 'fa-solid fa-graduation-cap' },
-  { name: 'Logistics', slug: 'logistics', icon: 'fa-solid fa-truck-fast' },
-  { name: 'Enterprise', slug: 'enterprise', icon: 'fa-solid fa-building-columns' },
+  {
+    name: 'Technology & Software',
+    slug: 'technology-software',
+    description: 'Building infrastructure that helps technology companies scale and innovate.',
+    icon: 'fa-solid fa-laptop-code',
+  },
+  {
+    name: 'Financial Services',
+    slug: 'financial-services',
+    description: 'Supporting secure, reliable, and resilient technology environments.',
+    icon: 'fa-solid fa-building-columns',
+  },
+  {
+    name: 'Healthcare',
+    slug: 'healthcare',
+    description:
+      'Helping power technology environments where availability and security are critical.',
+    icon: 'fa-solid fa-house-medical',
+  },
+  {
+    name: 'Education & Research',
+    slug: 'education-research',
+    description:
+      'Supporting high-performance computing, research infrastructure, and digital environments.',
+    icon: 'fa-solid fa-graduation-cap',
+  },
+  {
+    name: 'E-commerce',
+    slug: 'e-commerce',
+    description: 'Building scalable infrastructure for growing digital businesses.',
+    icon: 'fa-solid fa-cart-shopping',
+  },
+  {
+    name: 'Enterprise',
+    slug: 'enterprise',
+    description:
+      'Helping organizations modernize, secure, and optimize complex technology environments.',
+    icon: 'fa-solid fa-city',
+  },
+  {
+    name: 'AI & Data',
+    slug: 'ai-data',
+    description:
+      'Supporting the infrastructure required for data-intensive workloads and intelligent applications.',
+    icon: 'fa-solid fa-brain',
+  },
 ];
 
 export const departments = [
@@ -300,28 +339,44 @@ export const jobs = [
   },
 ];
 
+/**
+ * Placeholder voices supplied with the launch copy. The source document notes
+ * these should be replaced with verified employee testimonials once actual team
+ * feedback is collected — hence the team attributions rather than names.
+ */
 export const testimonials = [
   {
-    authorName: 'Ayesha Khan',
-    authorRole: 'Senior Software Engineer',
+    authorName: 'Engineering Team',
     quote:
-      'RedFort is the first place I have worked where growth is not just a promise on a careers page — it is built into everything. I have learned more here in two years than in the five before it.',
+      'I wanted a role where I could actually solve problems — not just follow instructions.',
     rating: 5,
     isFeatured: true,
   },
   {
-    authorName: 'Bilal Ahmed',
-    authorRole: 'Product Designer',
+    authorName: 'DevOps Team',
     quote:
-      'The culture is genuinely collaborative. Ideas are heard no matter who they come from, and the people around me push me to do my best work every single day.',
+      'The biggest difference is the level of ownership. You get the opportunity to take responsibility for your work.',
     rating: 5,
     isFeatured: true,
   },
   {
-    authorName: 'Fatima Noor',
-    authorRole: 'QA Lead',
+    authorName: 'Cloud Engineering Team',
     quote:
-      'What sets RedFort apart is how much it invests in people. The learning budget, the mentorship, the trust to own my work — it all adds up to a place I am proud to call home.',
+      'There is always something new to learn. The technology keeps moving, and so do we.',
+    rating: 5,
+    isFeatured: true,
+  },
+  {
+    authorName: 'Infrastructure Team',
+    quote:
+      'Working on real infrastructure challenges has helped me grow much faster technically.',
+    rating: 5,
+    isFeatured: true,
+  },
+  {
+    authorName: 'RFT 360 Team',
+    quote:
+      'The best part is being surrounded by people who are willing to share knowledge and help each other improve.',
     rating: 5,
     isFeatured: true,
   },
@@ -329,40 +384,40 @@ export const testimonials = [
 
 export const faqs = [
   {
-    question: 'What is RFT360?',
+    question: 'What kind of people does RFT 360 look for?',
     answer:
-      'RFT360 is our careers and culture platform. It’s where we show what we value, how we work, and what it’s actually like to build a career here.',
+      'We look for curious, responsible, technically capable people who enjoy solving problems and are willing to continuously learn and improve.',
     category: 'General',
   },
   {
-    question: 'How do I apply for a role at RedFort?',
+    question: 'Do I need experience in every technology listed in the job description?',
     answer:
-      'Browse our open positions on the Careers page and apply directly through the site. Upload your CV, tell us a little about yourself, and our talent team will be in touch.',
-    category: 'Careers',
+      'Not necessarily. Requirements vary by role. We value strong fundamentals, problem-solving ability, and the willingness to learn alongside relevant technical experience.',
+    category: 'Hiring',
   },
   {
-    question: 'Do you hire fresh graduates and interns?',
+    question: 'Are there opportunities for fresh graduates?',
     answer:
-      'Absolutely. We actively hire graduates and interns and invest heavily in early-career growth through structured mentorship and learning programmes.',
-    category: 'Careers',
+      'Yes. Where suitable positions are available, we consider graduates and early-career professionals who demonstrate strong fundamentals, curiosity, and potential.',
+    category: 'Hiring',
   },
   {
-    question: 'Is remote or hybrid work available?',
+    question: 'What can I expect during the hiring process?',
     answer:
-      'Many of our roles are hybrid-friendly. We care about outcomes and offer flexibility wherever the role allows. Each job posting lists its specific work arrangement.',
-    category: 'Work Life',
+      'The process may include an application review, an initial discussion, a technical assessment or interview, and a final conversation depending on the role.',
+    category: 'Hiring',
   },
   {
-    question: 'What is the interview process like?',
+    question: 'Can I apply if there isn’t a position that matches my profile?',
     answer:
-      'Our process is designed to be respectful of your time — typically an introductory conversation, a role-specific assessment or discussion, and a final conversation with the team you would join.',
-    category: 'Careers',
+      'Yes. If you believe your skills could contribute to RFT 360, you can still share your CV with our team for future opportunities.',
+    category: 'Hiring',
   },
   {
-    question: 'What benefits do RedFort employees receive?',
+    question: 'How can I apply for a position?',
     answer:
-      'Competitive salaries, comprehensive health cover, an annual learning budget, flexible hours, a modern workspace and genuine career-growth opportunities. See the Life at RedFort page for more.',
-    category: 'Benefits',
+      'Explore our current openings and submit your application through the relevant job posting. You can also contact our careers team for available opportunities.',
+    category: 'Hiring',
   },
 ];
 
@@ -500,11 +555,11 @@ export const footerColumns = [
     label: 'Explore',
     children: [
       { label: 'Home', href: '/' },
-      { label: 'About Culture', href: '/about-culture' },
-      { label: 'Life at RFT360', href: '/life-at-redfort' },
-      { label: 'Events', href: '/events' },
-      { label: 'Gallery', href: '/gallery' },
-      { label: 'Blogs', href: '/blogs' },
+      { label: 'About RFT 360', href: '/about-culture' },
+      { label: 'Services', href: '/#services' },
+      { label: 'Industries', href: '/#industries' },
+      { label: 'Careers', href: '/careers' },
+      { label: 'Contact', href: '/contact' },
     ],
   },
   {
@@ -512,8 +567,8 @@ export const footerColumns = [
     children: [
       { label: 'Open Positions', href: '/careers' },
       { label: 'Our Culture', href: '/about-culture' },
-      { label: 'Life at RFT360', href: '/life-at-redfort' },
-      { label: 'Contact', href: '/contact' },
+      { label: 'Life at RFT 360', href: '/life-at-redfort' },
+      { label: 'Employee Stories', href: '/blogs' },
     ],
   },
 ];
@@ -604,95 +659,114 @@ export const homepageSections = [
   {
     type: HomepageSectionType.HERO,
     name: 'Hero',
-    eyebrow: 'RFT360 · Lahore, Pakistan',
-    heading: 'Build Your Career',
-    headingAccent: 'at RedFort',
-    subheading: 'Work with people who care about the craft. Grow faster than you expected.',
-    ctaPrimary: { label: 'Explore Careers', href: '/careers', variant: 'primary' },
-    ctaSecondary: { label: 'Life at RedFort', href: '/life-at-redfort', variant: 'outline' },
+    eyebrow: 'Careers at RFT 360',
+    heading: 'Build What’s Next.',
+    headingAccent: 'Build Your Career at RFT 360.',
+    subheading:
+      'Where technology challenges become opportunities — and careers become long-term journeys.',
+    ctaPrimary: { label: 'Explore Open Positions', href: '/careers', variant: 'primary' },
+    ctaSecondary: { label: 'Meet the Team', href: '/about-culture', variant: 'outline' },
   },
   {
     type: HomepageSectionType.WHO_WE_ARE,
-    name: 'Who We Are',
-    eyebrow: 'Inside RedFort',
-    heading: 'Where careers are',
-    headingAccent: 'built, not filled',
-    subheading:
-      'We build products people rely on — and a workplace people stay in. This is where we tell that story.',
+    name: 'Inside RFT 360',
+    eyebrow: 'Inside RFT 360',
+    heading: 'Where Careers Are',
+    headingAccent: 'Built, Not Filled.',
+    subheading: 'A job gives you responsibilities. A career gives you direction.',
+    bodyHtml:
+      '<p>At RFT 360, we believe great people grow when they are given meaningful challenges, ' +
+      'trusted with responsibility, and surrounded by people who push them to become better.</p>' +
+      '<p>Here, you can expect:</p>' +
+      '<ul>' +
+      '<li>Real-world technology challenges</li>' +
+      '<li>Opportunities to work with modern technologies</li>' +
+      '<li>Collaboration with experienced professionals</li>' +
+      '<li>Continuous learning and skill development</li>' +
+      '<li>Ownership of meaningful projects</li>' +
+      '<li>A culture that values ideas and initiative</li>' +
+      '</ul>' +
+      '<p>Your next role shouldn’t just be another position. It should be your next step forward.</p>',
     imageKey: 'culture-team',
   },
   {
     type: HomepageSectionType.SERVICES,
-    name: 'What Our Teams Do',
-    eyebrow: 'Six disciplines',
-    heading: 'The teams you could',
-    headingAccent: 'join',
-    subheading: 'Engineering, design, QA, data, people and operations — six teams, one standard.',
+    name: 'Disciplines',
+    eyebrow: 'Disciplines',
+    heading: '6 Disciplines.',
+    headingAccent: 'One High-Performance Team.',
     itemLimit: 6,
   },
   {
     type: HomepageSectionType.WHY_CHOOSE_US,
-    name: 'Why Work With Us',
-    eyebrow: 'What you get',
-    heading: 'Benefits that',
-    headingAccent: 'actually matter',
-    subheading: 'Not ping-pong tables. Real salary, real cover, real time to learn.',
+    name: 'What You Get',
+    eyebrow: 'What You Get',
+    heading: 'What You Get When You Join',
+    headingAccent: 'RFT 360',
+    subheading: 'We want our people to grow alongside the technology they work with.',
     itemLimit: 6,
   },
   {
     type: HomepageSectionType.INDUSTRIES,
-    name: 'Domains We Work In',
-    eyebrow: 'Where our work lands',
-    heading: 'Industries we',
-    headingAccent: 'build for',
-    subheading: 'Deep expertise across the industries shaping tomorrow.',
-    itemLimit: 6,
+    name: 'Where Our Work Lands',
+    eyebrow: 'Where Our Work Lands',
+    heading: 'The Industries We',
+    headingAccent: 'Build For',
+    subheading:
+      'Technology doesn’t exist in isolation. It powers the businesses, systems, and industries ' +
+      'people depend on every day. RFT 360 works across technology-driven industries where ' +
+      'reliability, performance, security, and scalability matter.',
+    itemLimit: 7,
   },
   {
+    // Not part of the supplied home-page content. Kept in the CMS but hidden, so
+    // it can be switched back on without re-creating it.
     type: HomepageSectionType.CASE_STUDIES,
     name: 'Employee Success Stories',
+    isVisible: false,
     eyebrow: 'Real people, real growth',
     heading: 'Where our people',
     headingAccent: 'ended up',
-    subheading: 'Real stories from real people who have grown their careers at RedFort.',
     itemLimit: 3,
   },
   {
     type: HomepageSectionType.TESTIMONIALS,
-    name: 'Testimonials',
-    eyebrow: 'Unedited',
-    heading: 'What the team',
-    headingAccent: 'actually says',
-    subheading: 'No marketing polish — just what it’s like to work here.',
-    itemLimit: 3,
+    name: 'What the Team Actually Says',
+    heading: 'What the Team',
+    headingAccent: 'Actually Says',
+    itemLimit: 5,
   },
   {
     type: HomepageSectionType.FAQ,
-    name: 'FAQ',
-    eyebrow: 'Before you apply',
-    heading: 'Questions we get',
-    headingAccent: 'a lot',
-    subheading: 'Everything you need to know about careers and life at RedFort.',
+    name: 'FAQs',
+    eyebrow: 'FAQs',
+    heading: 'Frequently Asked',
+    headingAccent: 'Questions',
     itemLimit: 6,
+    ctaPrimary: { label: 'View Open Positions', href: '/careers', variant: 'primary' },
   },
   {
+    // Not part of the supplied home-page content. Hidden rather than deleted.
     type: HomepageSectionType.LATEST_BLOGS,
     name: 'Latest Blogs',
+    isVisible: false,
     eyebrow: 'From the team',
     heading: 'What we’re',
     headingAccent: 'writing about',
-    subheading: 'Stories and perspectives from the RedFort team.',
     itemLimit: 3,
   },
   {
     type: HomepageSectionType.CONTACT_FORM,
-    name: 'Contact Form',
-    eyebrow: 'Next step',
-    heading: 'Let’s talk about',
-    headingAccent: 'your career',
+    name: 'Contact',
+    eyebrow: 'Ready to start?',
+    heading: 'Ready to Build Your',
+    headingAccent: 'Next Chapter?',
     subheading:
-      'Whether you have a question or are ready to apply, we would love to hear from you.',
-    ctaPrimary: { label: 'View Open Roles', href: '/careers', variant: 'primary' },
+      'Whether you’re an experienced engineer, an ambitious graduate, or a technology ' +
+      'professional looking for your next challenge, we’d like to hear from you. ' +
+      'Bring your skills. Bring your curiosity. Bring your ambition. ' +
+      'Let’s build what’s next — together.',
+    ctaPrimary: { label: 'View Current Openings', href: '/careers', variant: 'primary' },
   },
 ];
 
