@@ -19,7 +19,8 @@
     "db:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
     "db:seed": "dotenv -e ../../.env -- ts-node --transpile-only prisma/seed.ts",
     "db:studio": "dotenv -e ../../.env -- prisma studio",
-    "db:reset": "dotenv -e ../../.env -- prisma migrate reset --force"
+    "db:reset": "dotenv -e ../../.env -- prisma migrate reset --force",
+    "db:seed:refresh": "dotenv -e ../../.env -- node -e \"process.env.SEED_REFRESH='true';require('ts-node').register({transpileOnly:true});require('./prisma/seed.ts')\""
   },
   "prisma": {
     "seed": "ts-node --transpile-only prisma/seed.ts"

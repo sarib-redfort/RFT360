@@ -147,7 +147,7 @@ Existing images stay on Supabase, so copy the bucket across before you retire it
 5. When it goes live, confirm: `https://rft360-api.onrender.com/health` returns
    `{"status":"ok"}`.
 
-### Seed the database — once, and only once
+### Seed the database
 
 The build already ran `prisma migrate deploy` (schema only — no content).
 Now load the initial content and create your admin user.
@@ -168,10 +168,19 @@ npm run db:seed --workspace=@rft360/api
 Afterwards close that shell (or clear `$env:DATABASE_URL`), or your next local
 `npm run dev` will point at production.
 
-This is idempotent, but re-running it **resets homepage section copy, site
-branding, page hero text and FAQ answers to the shipped defaults** — so any
-edits you make in the CMS to those specific fields would be overwritten. Run it
-now, then never again.
+`db:seed` only fills in what is missing. Existing rows are never touched, so
+anything edited in the CMS survives and the command is safe to re-run.
+
+To deliberately re-apply the shipped defaults — after updating the content
+document, say — use the refresh variant instead. **It overwrites editor
+changes**, and prunes services or industries the seed no longer ships:
+
+```powershell
+npm run db:seed:refresh --workspace=@rft360/api
+```
+
+The banner tells you which mode ran: *"existing rows preserved"* versus
+*"REFRESH — shipped defaults overwrite existing rows"*.
 
 Every future deploy runs migrations automatically and leaves your content alone.
 

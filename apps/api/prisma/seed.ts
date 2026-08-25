@@ -18,8 +18,31 @@ const PUBLISHED = { status: ContentStatus.PUBLISHED, publishedAt: new Date() };
 /** Populated by `seedMedia()`; maps a seed image key -> created Media id. */
 const mediaIds = new Map<string, string>();
 
+/**
+ * Shipped content is a DEFAULT, not a source of truth.
+ *
+ * By default the seed only fills in what is missing: existing rows are left
+ * exactly as they are, so anything edited in the CMS survives a re-run and
+ * `db:seed` is safe to repeat. Without this, a routine re-seed silently
+ * reverts every heading, benefit and FAQ an editor has changed.
+ *
+ * Run `npm run db:seed:refresh` (SEED_REFRESH=true) to deliberately re-apply
+ * the shipped defaults over existing rows — for example after updating the
+ * content document. That is the only mode that overwrites editor changes.
+ */
+const REFRESH = ['true', '1', 'yes'].includes((process.env.SEED_REFRESH ?? '').toLowerCase());
+
+/** Update payload for shipped copy: empty unless refreshing. */
+function shipped<T extends object>(fields: T): T | Record<string, never> {
+  return REFRESH ? fields : {};
+}
+
 async function main() {
-  console.log('🌱 Seeding RFT360 database...\n');
+  console.log(
+    REFRESH
+      ? '🌱 Seeding RFT360 (REFRESH — shipped defaults overwrite existing rows)...\n'
+      : '🌱 Seeding RFT360 (existing rows preserved)...\n',
+  );
 
   await seedAdmin();
   await seedMedia();
@@ -122,6 +145,10 @@ async function seedSettings() {
 
   const existing = await prisma.siteSettings.findFirst();
   if (existing) {
+      if (!REFRESH) {
+        console.log('  · Site settings exist — left as-is');
+        return;
+      }
     await prisma.siteSettings.update({ where: { id: existing.id }, data: branding });
     console.log('  ✓ Site settings (branding refreshed)');
     return;
@@ -145,7 +172,7 @@ async function seedNavigation() {
   for (const item of data.navigationItems) {
     await prisma.navigationItem.upsert({
       where: { id: `nav-${item.order}` },
-      update: { label: item.label, href: item.href, order: item.order, location: item.location },
+      update: shipped({ label: item.label, href: item.href, order: item.order, location: item.location }),
       create: {
         id: `nav-${item.order}`,
         label: item.label,
@@ -162,7 +189,7 @@ async function seedNavigation() {
     const parentId = `footer-col-${c}`;
     await prisma.navigationItem.upsert({
       where: { id: parentId },
-      update: { label: column.label, order: c },
+      update: shipped({ label: column.label, order: c }),
       create: {
         id: parentId,
         label: column.label,
@@ -174,7 +201,7 @@ async function seedNavigation() {
     for (const [i, child] of column.children.entries()) {
       await prisma.navigationItem.upsert({
         where: { id: `${parentId}-${i}` },
-        update: { label: child.label, href: child.href, order: i },
+        update: shipped({ label: child.label, href: child.href, order: i }),
         create: {
           id: `${parentId}-${i}`,
           label: child.label,
@@ -199,14 +226,12 @@ async function seedPages() {
   for (const page of data.pages) {
     await prisma.page.upsert({
       where: { slug: page.slug },
-      // Hero copy is shipped default text — refresh it so wording fixes reach
-      // existing rows instead of being stranded in the database.
-      update: {
+      update: shipped({
         eyebrow: page.eyebrow,
         heading: page.heading,
         headingAccent: (page as { headingAccent?: string }).headingAccent ?? null,
         subheading: page.subheading,
-      },
+      }),
       create: { ...page, ...PUBLISHED },
     });
   }
@@ -228,14 +253,14 @@ async function seedServicesAndIndustries() {
   for (const [i, service] of data.services.entries()) {
     await prisma.service.upsert({
       where: { slug: service.slug },
-      update: { ...service },
+      update: shipped({ ...service }),
       create: { ...service, order: i, ...PUBLISHED },
     });
   }
   for (const [i, industry] of data.industries.entries()) {
     await prisma.industry.upsert({
       where: { slug: industry.slug },
-      update: { ...industry },
+      update: shipped({ ...industry }),
       create: { ...industry, order: i, ...PUBLISHED },
     });
   }
@@ -250,14 +275,21 @@ async function seedServicesAndIndustries() {
    * NOTE: this removes services/industries added through the CMS. Add those
    * back here if they should survive a re-seed.
    */
-  const removedServices = await prisma.service.deleteMany({
-    where: { slug: { notIn: data.services.map((s) => s.slug) } },
-  });
-  const removedIndustries = await prisma.industry.deleteMany({
-    where: { slug: { notIn: data.industries.map((s) => s.slug) } },
-  });
-
-  const pruned = removedServices.count + removedIndustries.count;
+  /*
+   * Refresh-only, and deliberately so: outside a refresh this would delete
+   * every service or industry added through the CMS.
+   */
+  let pruned = 0;
+  if (REFRESH) {
+    const removedServices = await prisma.service.deleteMany({
+      where: { slug: { notIn: data.services.map((s) => s.slug) } },
+    });
+    const removedIndustries = await prisma.industry.deleteMany({
+      where: { slug: { notIn: data.industries.map((s) => s.slug) } },
+    });
+    pruned = removedServices.count + removedIndustries.count;
+  }
+  
   console.log(
     `  ✓ Services (${data.services.length}) & industries (${data.industries.length})` +
       (pruned > 0 ? ` — pruned ${pruned} superseded` : ''),
@@ -295,7 +327,7 @@ async function seedTeam() {
   for (const [i, member] of data.teamMembers.entries()) {
     await prisma.teamMember.upsert({
       where: { id: `team-${i}` },
-      update: { ...member },
+      update: shipped({ ...member }),
       create: { id: `team-${i}`, ...member, order: i, ...PUBLISHED },
     });
   }
@@ -306,7 +338,7 @@ async function seedTestimonialsAndFaqs() {
   for (const [i, t] of data.testimonials.entries()) {
     await prisma.testimonial.upsert({
       where: { id: `testimonial-${i}` },
-      update: { ...t },
+      update: shipped({ ...t }),
       create: { id: `testimonial-${i}`, ...t, order: i, ...PUBLISHED },
     });
   }
@@ -315,7 +347,7 @@ async function seedTestimonialsAndFaqs() {
       where: { id: `faq-${i}` },
       // FAQ text is shipped copy, so re-seeding refreshes it — otherwise a
       // wording change stays stranded in the database.
-      update: { question: f.question, answer: f.answer, category: f.category },
+      update: shipped({ question: f.question, answer: f.answer, category: f.category }),
       create: { id: `faq-${i}`, ...f, order: i, ...PUBLISHED },
     });
   }
@@ -327,7 +359,7 @@ async function seedCaseStudies() {
     const { imageKey, ...rest } = cs as typeof cs & { imageKey?: string };
     await prisma.caseStudy.upsert({
       where: { slug: cs.slug },
-      update: imagePatch('coverImageId', imageKey),
+      update: shipped(imagePatch('coverImageId', imageKey)),
       create: { ...rest, coverImageId: img(imageKey), order: i, ...PUBLISHED },
     });
   }
@@ -341,7 +373,7 @@ async function seedEvents() {
     const eventStatus = daysFromNow < 0 ? 'COMPLETED' : daysFromNow < 3 ? 'ONGOING' : 'UPCOMING';
     await prisma.event.upsert({
       where: { slug: ev.slug },
-      update: imagePatch('coverImageId', imageKey),
+      update: shipped(imagePatch('coverImageId', imageKey)),
       create: {
         ...rest,
         startsAt,
@@ -363,7 +395,7 @@ async function seedGallery() {
     };
     const record = await prisma.galleryAlbum.upsert({
       where: { slug: album.slug },
-      update: imagePatch('coverImageId', imageKey),
+      update: shipped(imagePatch('coverImageId', imageKey)),
       create: { ...rest, coverImageId: img(imageKey), order: i, ...PUBLISHED },
     });
 
@@ -422,7 +454,7 @@ async function seedBlog() {
     const words = rest.contentHtml.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
     await prisma.post.upsert({
       where: { slug: post.slug },
-      update: imagePatch('coverImageId', imageKey),
+      update: shipped(imagePatch('coverImageId', imageKey)),
       create: {
         ...rest,
         categoryId: catIdBySlug.get(categorySlug),
@@ -458,21 +490,18 @@ async function seedHomepageSections() {
       };
 
       await prisma.homepageSection.upsert({
-        where: { id: `section-${section.type}` },
-        /*
-         * Section content is a shipped default, so re-seeding refreshes ALL of
-         * it: copy, CTAs, item limits and visibility. Refreshing only some
-         * fields (as this previously did) leaves a half-updated section, e.g. a
-         * new heading above a stale call-to-action.
-         *
-         * NOTE: a re-seed therefore resets homepage copy edited in the CMS. Do
-         * your final seed first, then customise in Admin -> Homepage.
-         */
-        update: {
-          ...copy,
-          ...imagePatch('imageId', (section as { imageKey?: string }).imageKey),
-        },
-        create: {
+      where: { id: `section-${section.type}` },
+      /*
+       * On a refresh this rewrites the section completely — copy, CTAs, item
+       * limit and visibility together. Updating only some of those fields
+       * leaves a half-applied section, e.g. a new heading above a stale
+       * call-to-action.
+       */
+      update: shipped({
+        ...copy,
+        ...imagePatch('imageId', (section as { imageKey?: string }).imageKey),
+      }),
+      create: {
           id: `section-${section.type}`,
           type: section.type,
           ...copy,
@@ -501,7 +530,7 @@ async function upsertOrdered<T extends Record<string, unknown>>(
     const id = `${model}-${i}`;
     await delegate.upsert({
       where: { id },
-      update: { ...item },
+      update: shipped({ ...item }),
       create: { id, ...item, order: i, ...PUBLISHED },
     });
   }

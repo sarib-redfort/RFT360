@@ -27,6 +27,7 @@
     "db:migrate": "npm run db:migrate --workspace=@rft360/api",
     "db:deploy": "npm run db:deploy --workspace=@rft360/api",
     "db:seed": "npm run db:seed --workspace=@rft360/api",
+    "db:seed:refresh": "npm run db:seed:refresh --workspace=@rft360/api",
     "db:studio": "npm run db:studio --workspace=@rft360/api",
     "db:reset": "npm run db:reset --workspace=@rft360/api",
     "db:up": "node scripts/db.mjs up",

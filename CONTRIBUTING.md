@@ -88,5 +88,16 @@ reference.
 npm run typecheck && npm run lint && npm run test && npm run build
 ```
 
+## Default content
+
+`apps/api/prisma/seed-data.ts` holds the site's **default content** — the copy a
+fresh install starts with. Everything in it is editable afterwards in the CMS.
+
+`npm run db:seed` is create-only: it fills in missing rows and leaves existing
+ones alone, so editor changes are never clobbered. When you change the shipped
+copy and want it applied to a database that already has content, run
+`npm run db:seed:refresh` — that mode overwrites existing rows and prunes
+services/industries no longer in the data file.
+
 Commit the Prisma migration when you change `schema.prisma`
 (`npm run db:migrate -- --name your_change`).
